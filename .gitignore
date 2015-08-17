@@ -1,4 +1,3 @@
 .idea
-.idea/
-Application/Runtime
+Application/Runtime/Logs/Home/*.log
 Uploads
