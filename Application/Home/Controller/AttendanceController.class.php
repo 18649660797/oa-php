@@ -8,6 +8,7 @@
 
 namespace Home\Controller;
 use Home\Model\Employee;
+use Home\Utils\ExcelUtils;
 use Org\Util\ArrayList;
 use Org\Util\String;
 use Think\Controller;
@@ -19,7 +20,7 @@ class AttendanceController extends Controller {
     public function upload() {
         $upload = new \Think\Upload();// 实例化上传类
         $upload->maxSize   =     3145728 ;// 设置附件上传大小
-        $upload->exts      =     array('jpg', 'gif', 'png', 'jpeg', 'xls');// 设置附件上传类型
+        $upload->exts      =     array('jpg', 'gif', 'png', 'jpeg', 'xls', "xlsx");// 设置附件上传类型
         $upload->rootPath  =     './Uploads/'; // 设置附件上传根目录
         $upload->savePath  =     ''; // 设置附件上传（子）目录
         // 上传文件
@@ -53,19 +54,56 @@ class AttendanceController extends Controller {
                 {
                     echo $this -> GetData($val)."\t";
                 }else{
-//echo $val;
+                    //echo $val;
                     /**如果输出汉字有乱码，则需将输出内容用iconv函数进行编码转换，如下将gb2312编码转为utf-8编码输出*/
                     echo iconv('utf-8','gb2312', $val)."\t";
                 }
             }
             echo "</br>";
         }
-        $Employee = M("Employee");
-        $data['name'] = "林嘉斌";
-        $data['id'] = 33;
-        String::isUtf8();
-        $Employee -> add($data);
+
+
+        $objPHPExcel = new \PHPExcel();
+        $objPHPExcel->getProperties()->setCreator("Maarten Balliauw");
+        $objPHPExcel->getProperties()->setLastModifiedBy("Maarten Balliauw");
+        $objPHPExcel->getProperties()->setTitle("Office 2007 XLSX Test Document");
+        $objPHPExcel->getProperties()->setSubject("Office 2007 XLSX Test Document");
+        $objPHPExcel->getProperties()->setDescription("Test document for Office 2007 XLSX, generated using PHP classes.");
+        // Add some data
+        $objPHPExcel->setActiveSheetIndex(0);
+        $objPHPExcel->getActiveSheet()->SetCellValue('A1', 'Hello');
+        $objPHPExcel->getActiveSheet()->getStyle('A1')->getFill()->setFillType(\PHPExcel_Style_Fill::FILL_SOLID);
+        $objPHPExcel->getActiveSheet()->getStyle('A1')->getFill()->getStartColor()->setARGB('FF808080');
+        $objPHPExcel->getActiveSheet()->SetCellValue('B2', 'world!');
+        $objPHPExcel->getActiveSheet()->SetCellValue('C1', 'Hello');
+        $objPHPExcel->getActiveSheet()->SetCellValue('D2', 'world!');
+        // Rename sheet
+        $objPHPExcel->getActiveSheet()->setTitle('Simple');
+        ExcelUtils::excel($objPHPExcel);
     }
+
+    public function excel() {
+        import("Org.Util.PHPExcel");
+        $objPHPExcel = new \PHPExcel();
+        $objPHPExcel->getProperties()->setCreator("Maarten Balliauw");
+        $objPHPExcel->getProperties()->setLastModifiedBy("Maarten Balliauw");
+        $objPHPExcel->getProperties()->setTitle("Office 2007 XLSX Test Document");
+        $objPHPExcel->getProperties()->setSubject("Office 2007 XLSX Test Document");
+        $objPHPExcel->getProperties()->setDescription("Test document for Office 2007 XLSX, generated using PHP classes.");
+        // Add some data
+        $objPHPExcel->setActiveSheetIndex(0);
+        $objPHPExcel->getActiveSheet()->SetCellValue('A1', 'Hello');
+        $objPHPExcel->getActiveSheet()->getStyle('A1')->getFill()->setFillType(\PHPExcel_Style_Fill::FILL_SOLID);
+        $objPHPExcel->getActiveSheet()->getStyle('A1')->getFill()->getStartColor()->setARGB('FF808080');
+        $objPHPExcel->getActiveSheet()->SetCellValue('B2', 'world!');
+        $objPHPExcel->getActiveSheet()->SetCellValue('C1', 'Hello');
+        $objPHPExcel->getActiveSheet()->SetCellValue('D2', 'world!');
+        // Rename sheet
+        $objPHPExcel->getActiveSheet()->setTitle('Simple');
+        ExcelUtils::excel($objPHPExcel);
+    }
+
+
 
     function GetData($val){
         $jd = GregorianToJD(1, 1, 1970);
