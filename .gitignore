@@ -1,4 +1,4 @@
 .idea
 Application/Runtime/Logs/Home/*.log
-Application/Runtime/Cache/Home/*
+#Application/Runtime/Cache/Home/*.php
 Uploads

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <?php include_once $_SERVER["DOCUMENT_ROOT"] . "/Public/include/resources.php"; ?>
+</head>
+<body>
+    <div id="grid"></div>
+<script>
+    (function($) {
+        $(function() {
+            var Grid = BUI.Grid,
+                    Data = BUI.Data;
+            var Grid = Grid,
+                    Store = Data.Store,
+                    columns = [
+                        {title: 'id', dataIndex: 'id', width: 100},
+                        {title: '姓名', dataIndex: 'name', width: 200},
+                        {title: '部门', dataIndex: 'department', width: 200},
+                        {title: '打卡日期', dataIndex: 'work_date', width: 200},
+                        {title: '上午打卡', dataIndex: 'am_time', width: 200},
+                        {title: '下午打卡', dataIndex: 'pm_time', width: 200}
+                    ];
+
+            /**
+             * 自动发送的数据格式：
+             *  1. start: 开始记录的起始数，如第 20 条,从0开始
+             *  2. limit : 单页多少条记录
+             *  3. pageIndex : 第几页，同start参数重复，可以选择其中一个使用
+             *
+             * 返回的数据格式：
+             *  {
+         *     "rows" : [{},{}], //数据集合
+         *     "results" : 100, //记录总数
+         *     "hasError" : false, //是否存在错误
+         *     "error" : "" // 仅在 hasError : true 时使用
+         *   }
+             *
+             */
+            var store = new Store({
+                        url : '/index.php/home/attendance/data',
+                        autoLoad:true, //自动加载数据
+                        params : { //配置初始请求的参数
+
+                        },
+                        pageSize:10	// 配置分页数目
+                    }),
+                    grid = new Grid.Grid({
+                        render:'#grid',
+                        columns : columns,
+                        loadMask: true, //加载数据时显示屏蔽层
+                        store: store,
+                        // 底部工具栏
+                        bbar:{
+                            // pagingBar:表明包含分页栏
+                            pagingBar:true
+                        }
+                    });
+
+            grid.render();
+        });
+    } (jQuery));
+</script>
+</body>
+</html>

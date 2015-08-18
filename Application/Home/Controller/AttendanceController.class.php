@@ -45,41 +45,39 @@ class AttendanceController extends Controller {
         $allColumn = $currentSheet->getHighestColumn();
         /**取得一共有多少行*/
         $allRow = $currentSheet->getHighestRow();
+        $jsonArray = array(
+            'A' => 'department',
+            'B' => 'name',
+            'C' => 'work_date',
+            'D' => 'am_time',
+            'F' => 'pm_time'
+        );
         /**从第二行开始输出，因为excel表中第一行为列名*/
-        for($currentRow = 2;$currentRow <= $allRow;$currentRow++){
+        for($currentRow = 3;$currentRow <= $allRow;$currentRow++){
             /**从第A列开始输出*/
+            $attendance = M("Attendance");
+            $data = array();
             for($currentColumn= 'A';$currentColumn<= $allColumn; $currentColumn++){
-                $val = $currentSheet->getCellByColumnAndRow(ord($currentColumn) - 65,$currentRow)->getValue();/**ord()将字符转为十进制数*/
-                if($currentColumn == 'A')
-                {
-                    echo $this -> GetData($val)."\t";
-                }else{
-                    //echo $val;
-                    /**如果输出汉字有乱码，则需将输出内容用iconv函数进行编码转换，如下将gb2312编码转为utf-8编码输出*/
-                    echo iconv('utf-8','gb2312', $val)."\t";
+                if (!$jsonArray[$currentColumn]) {
+                    continue;
                 }
+//                $val = $currentSheet->getCellByColumnAndRow(ord($currentColumn) - 65,$currentRow)->getValue();/**ord()将字符转为十进制数*/
+                $val = $currentSheet -> getCell("$currentColumn$currentRow") -> getValue();
+                if ($currentColumn == 'C') {
+                    $val = date('Y-m-d',strtotime($val));
+                } else if ($currentColumn > 'C') {
+                    $val = date('Y-m-d h:i:s', strtotime($val));
+                } else {
+                    $val = iconv('utf-8','gbk', $val);
+                    $val = iconv('gbk','utf-8', $val);
+                }
+                $data[$jsonArray[$currentColumn]] = $val;
             }
-            echo "</br>";
+//            var_dump($data);
+            if ($data["name"]) {
+                $attendance -> add($data);
+            }
         }
-
-
-        $objPHPExcel = new \PHPExcel();
-        $objPHPExcel->getProperties()->setCreator("Maarten Balliauw");
-        $objPHPExcel->getProperties()->setLastModifiedBy("Maarten Balliauw");
-        $objPHPExcel->getProperties()->setTitle("Office 2007 XLSX Test Document");
-        $objPHPExcel->getProperties()->setSubject("Office 2007 XLSX Test Document");
-        $objPHPExcel->getProperties()->setDescription("Test document for Office 2007 XLSX, generated using PHP classes.");
-        // Add some data
-        $objPHPExcel->setActiveSheetIndex(0);
-        $objPHPExcel->getActiveSheet()->SetCellValue('A1', 'Hello');
-        $objPHPExcel->getActiveSheet()->getStyle('A1')->getFill()->setFillType(\PHPExcel_Style_Fill::FILL_SOLID);
-        $objPHPExcel->getActiveSheet()->getStyle('A1')->getFill()->getStartColor()->setARGB('FF808080');
-        $objPHPExcel->getActiveSheet()->SetCellValue('B2', 'world!');
-        $objPHPExcel->getActiveSheet()->SetCellValue('C1', 'Hello');
-        $objPHPExcel->getActiveSheet()->SetCellValue('D2', 'world!');
-        // Rename sheet
-        $objPHPExcel->getActiveSheet()->setTitle('Simple');
-        ExcelUtils::excel($objPHPExcel);
     }
 
     public function excel() {
@@ -103,12 +101,21 @@ class AttendanceController extends Controller {
         ExcelUtils::excel($objPHPExcel);
     }
 
+    public function data() {
+        $data = M("Attendance");
+        $result["rows"] = $data  -> limit(I("start") . "," . I("limit")) -> select();
+        $result["results"] = 1000;
+        echo json_encode($result);
+    }
 
+    public function viewList() {
+        $this -> display(T("attendance/list"));
+    }
 
     function GetData($val){
-        $jd = GregorianToJD(1, 1, 1970);
+        $jd = GregorianToJD(1, 1,1970);
         $gregorian = JDToGregorian($jd+intval($val)-25569);
-        return $gregorian;/**显示格式为 “月/日/年” */
+        return date("h:i", $gregorian);/**显示格式为 “月/日/年” */
     }
 
 
