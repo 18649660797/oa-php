@@ -2,10 +2,41 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title></title>
+    <title>考勤数据</title>
     <?php include_once $_SERVER["DOCUMENT_ROOT"] . "/Public/include/resources.php"; ?>
 </head>
 <body>
+    <div class="row">
+        <form id="J_FORM" class="form-panel" action="data" method="post">
+            <div class="panel-title">
+            <span>
+              <label>打卡日期：</label><input name="between_work_date" type="text" class="calendar" /> <label>至</label> <input name="between_work_date" type="text" class="calendar" />
+            </span>
+            </div>
+            <ul class="panel-content">
+                <li>
+                    <label>姓名：</label>
+                    <input type="text" class="control-text" name="like_name" value="" />
+                </li>
+                <li>
+                    <label>部门：</label>
+                    <select name="eq_department">
+                        <option value="">全部</option>
+                        <option value="产品部">产品部</option>
+                        <option value="开发部">开发部</option>
+                        <option value="运营部">运营部</option>
+                        <option value="销售部">销售部</option>
+                        <option value="市场部">市场部</option>
+                        <option value="行政部">行政部</option>
+                        <!--<option value="客服部">客服部</option>-->
+                    </select>
+                </li>
+                <li>
+                    <button type="submit" class="button button-primary">查询>></button>
+                </li>
+            </ul>
+        </form>
+    </div>
     <div id="grid"></div>
 <script>
     (function($) {
@@ -15,12 +46,42 @@
             var Grid = Grid,
                     Store = Data.Store,
                     columns = [
-                        {title: 'id', dataIndex: 'id', width: 100},
-                        {title: '姓名', dataIndex: 'name', width: 200},
-                        {title: '部门', dataIndex: 'department', width: 200},
-                        {title: '打卡日期', dataIndex: 'work_date', width: 200},
-                        {title: '上午打卡', dataIndex: 'am_time', width: 200},
-                        {title: '下午打卡', dataIndex: 'pm_time', width: 200}
+//                        {title: 'id', dataIndex: 'id', width: 60},
+                        {title: '姓名', dataIndex: 'name', width: 60},
+                        {title: '部门', dataIndex: 'department', width: 60},
+                        {title: '打卡日期', dataIndex: 'work_date', width: 100, renderer: function(val, row) {
+                            return val.split(" ")[0];
+                        }},
+                        {title: '上午打卡', dataIndex: 'am_time', width: 150},
+                        {title: '下午打卡', dataIndex: 'pm_time', width: 150},
+                        {title: '迟到', dataIndex: 'am_time', width: 60, renderer: function(val, row) {
+                            var result = "";
+                            var amTime = row["am_time"];
+                            var amArr= amTime.split(" ")[1].split(":");
+                            var basicAmH = 9, basicAmM = 0;
+                            var amRule = (amArr[0] - basicAmH) * 60 + (amArr[1] - basicAmM);
+                            if (amRule >  0) {
+                                result += amRule + "分钟";
+                            }
+                            return result;
+                        }},
+                        {title: '早退', dataIndex: 'pm_time', width: 60, renderer: function(val, row) {
+                            var result = "";
+                            var pmTime = val;
+                            var pmArr = pmTime.split(" ")[1].split(":");
+                            var basicPmH = 18, basicPmM = 0;
+                            var pmRule = (basicPmH - pmArr[0]) * 60 + (basicPmM - pmArr[1]);
+                            if (pmRule >  0) {
+                                result += pmRule + "分钟" ;
+                            }
+                            return result;
+                        }},
+                        {title: '旷工', dataIndex: '', width: 60, renderer: function(val, row) {
+                            return (row["am_time"] || row["pm_time"]) ? "" : "是";
+                        }},
+                        {title: '请假', dataIndex: 'remark', width: 60, renderer: function(val, row) {
+                            return (row["am_time"] || row["pm_time"]) ? "" : "是";
+                        }}
                     ];
 
             /**
@@ -41,10 +102,8 @@
             var store = new Store({
                         url : '/index.php/home/attendance/data',
                         autoLoad:true, //自动加载数据
-                        params : { //配置初始请求的参数
-
-                        },
-                        pageSize:10	// 配置分页数目
+//                        params : $("#J_FORM").serialize(),
+                        pageSize:30	// 配置分页数目
                     }),
                     grid = new Grid.Grid({
                         render:'#grid',
@@ -57,8 +116,19 @@
                             pagingBar:true
                         }
                     });
-
             grid.render();
+
+            var form = new BUI.Form.HForm({
+                srcNode : '#J_FORM'
+            }).render();
+
+            form.on('beforesubmit',function(ev) {
+                //序列化成对象
+                var obj = form.serializeToObject();
+                obj.start = 0; //返回第一页
+                store.load(obj);
+                return false;
+            });
         });
     } (jQuery));
 </script>

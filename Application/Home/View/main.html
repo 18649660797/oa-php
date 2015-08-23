@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>main</title>
+    <?php include_once $_SERVER["DOCUMENT_ROOT"] . "/Public/include/resources.php"; ?>
+</head>
+<body>
+<div class="demo-content">
+    <!-- script start -->
+    <script type="text/javascript">
+        BUI.use(['bui/layout','bui/tab','bui/data','bui/tree'],function (Layout,Tab,Data,Tree) {
+            var nodes = [
+                        {text : '管理员设置',id : '1',children: [{text : '11',id : '11',href:'11.html'}]},
+                        {text : '考勤管理',id : '2',expanded : true,children : [
+                            {text : '查看',id : '22',href:'/home/attendance/list'}
+                        ]}
+                    ];
+            var control = new Layout.Viewport({
+                width:600,
+                height:500,
+                elCls : 'ext-border-layout',
+                children : [
+                /*{
+                    layout : {
+                        title : 'north',
+                        region : 'north',
+                        height : 100
+                    },
+                    xclass : 'controller',
+                    content : "顶部可以放logo，图片"
+                },*/{
+                    xclass : 'controller',
+                    layout : {
+                        region : 'south',
+                        title : 'south',
+                        fit : 'height',
+
+                        height : 50
+                    },
+                    width : 250,
+                    content : '底部信息'
+                },{
+                    xclass : 'controller',
+                    layout : {
+                        region : 'east',
+                        fit : 'both',
+                        collapsable : true,
+                        collapsed : true,
+                        title : '默认收缩',
+                        width : 150
+                    },
+                    elCls : 'red',
+                    content : "三 自适应宽高"
+                },{
+                    layout : {
+                        region : 'west',
+                        fit : 'both', //height,width,both,none
+                        title : '目录',
+                        collapsable : true,
+                        width : 250
+                    },
+                    xclass : 'tree-list',//生成tree
+                    id : 'mytree',
+                    nodes : nodes
+
+                },{
+                    xclass : 'nav-tab', //Grid
+                    layout : {
+                        region : 'center',
+                        title : '内容',
+                        fit : 'both'
+                    },
+                    id : 'tab'
+                }],
+                plugins : [Layout.Border]
+            });
+
+            control.render();
+            var tab = control.getChild('tab'),//通过id获取
+                    tree = control.getChild('mytree',true);  //级联查找树节点
+
+            tree.on('itemclick',function (ev) {
+                var node = ev.item,
+                        id = node.id,
+                        text = node.text,
+                        href = node.href;
+                tab.addTab({
+                    title : text,
+                    href : href,
+                    id : id
+                });
+            });
+        });
+    </script>
+    <!-- script end -->
+</div>
+</body>
+</html>

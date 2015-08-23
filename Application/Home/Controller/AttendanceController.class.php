@@ -7,12 +7,9 @@
  */
 
 namespace Home\Controller;
-use Home\Model\Employee;
 use Home\Utils\ExcelUtils;
-use Org\Util\ArrayList;
-use Org\Util\String;
-use Think\Controller;
-class AttendanceController extends Controller {
+
+class AttendanceController extends BasicController {
     public function view(){
         $this -> display(T("attendance/upload"));
     }
@@ -66,7 +63,8 @@ class AttendanceController extends Controller {
                 if ($currentColumn == 'C') {
                     $val = date('Y-m-d',strtotime($val));
                 } else if ($currentColumn > 'C') {
-                    $val = date('Y-m-d h:i:s', strtotime($val));
+                    $day = $currentSheet -> getCell("C$currentRow") -> getValue();
+                    $val = date('Y-m-d H:i:s', strtotime($day . $val));
                 } else {
                     $val = iconv('utf-8','gbk', $val);
                     $val = iconv('gbk','utf-8', $val);
@@ -78,6 +76,7 @@ class AttendanceController extends Controller {
                 $attendance -> add($data);
             }
         }
+        redirect("list");
     }
 
     public function excel() {
@@ -103,8 +102,37 @@ class AttendanceController extends Controller {
 
     public function data() {
         $data = M("Attendance");
-        $result["rows"] = $data  -> limit(I("start") . "," . I("limit")) -> select();
-        $result["results"] = 1000;
+        $condition = array();
+        foreach($_REQUEST as $key=>$value){
+            if (strpos($key, "_") > -1) {
+                $arr = explode("_", $key, 2);
+                if (count($arr) == 2) {
+                    switch ($arr[0]) {
+                        case "eq":
+                        case "neq":
+                        case "in":
+                        case "gt":
+                        case "lt":
+                        case "elt":
+                        case "egt":
+                        case "between":
+                            if ($value) {
+                                $condition[$arr[1]] = array($arr[0], $value);
+                            }
+                            break;
+                        case "like":
+                            $condition[$arr[1]] = array($arr[0], "%". $value . "%");
+                            break;
+                    }
+                }
+            }
+        }
+        $data -> where($condition);
+        $data  -> limit(I("start") . "," . I("limit"));
+        $result["rows"] = $data -> select();
+        $count = M("Attendance");
+        $count -> where($condition);
+        $result["results"] = $count -> count();
         echo json_encode($result);
     }
 

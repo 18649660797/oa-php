@@ -10,10 +10,12 @@ use Think\Model;
  */
 class Attendance extends Model
 {
+    protected $_map = array(
+        'workDate' =>'work_date',
+        'amTime'  =>'am_time',
+        'pmTime'  =>'pm_time',
+    );
     var $name;
     var $id;
     var $department;
-    var $work_date;
-    var $am_time;
-    var $pm_time;
 }
