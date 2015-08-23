@@ -24,7 +24,7 @@ class BasicController extends Controller
         $auth= new Auth();
 //        session("S_UID", 1);
         if (!session("S_UID")) {
-            $this->error("未登录", "home/login", 3);
+            redirect("/home/login");
             return;
         }
         $r = $auth-> check("super", session("S_UID"));

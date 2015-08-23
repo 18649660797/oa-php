@@ -18,10 +18,9 @@ class LoginServiceImpl implements LoginService
         }
         $user = M("AuthUser");
         $condition = array();
-        $condition["useranme"] = array("eq", $username);
+        $condition["username"] = array("eq", $username);
         $condition["password"] = array("eq", md5($passwod));
-        $user -> where($condition);
-        $data = $user -> find();
+        $data = $user -> where($condition) -> find();
         return $data;
     }
 

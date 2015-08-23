@@ -11,9 +11,10 @@
     <script type="text/javascript">
         BUI.use(['bui/layout','bui/tab','bui/data','bui/tree'],function (Layout,Tab,Data,Tree) {
             var nodes = [
-                        {text : '管理员设置',id : '1',children: [{text : '11',id : '11',href:'11.html'}]},
+                        {text : '管理员设置',id : '1', href: '/home/admin/list'},
+                        {text : '员工管理',id : '1', href: '/home/employee/list'},
                         {text : '考勤管理',id : '2',expanded : true,children : [
-                            {text : '查看',id : '22',href:'/home/attendance/list'}
+                            {text : '列表',id : '22',href:'/home/attendance/list'}
                         ]}
                     ];
             var control = new Layout.Viewport({
@@ -82,14 +83,16 @@
 
             tree.on('itemclick',function (ev) {
                 var node = ev.item,
-                        id = node.id,
-                        text = node.text,
-                        href = node.href;
-                tab.addTab({
-                    title : text,
-                    href : href,
-                    id : id
-                });
+                    id = node.id,
+                    text = node.text,
+                    href = node.href;
+                if (node.leaf) {
+                    tab.addTab({
+                        title : text,
+                        href : href,
+                        id : id
+                    });
+                }
             });
         });
     </script>

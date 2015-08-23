@@ -10,6 +10,9 @@ use Think\Model;
  */
 class Employee extends Model
 {
-    var $name;
+    protected $_map = array(
+        'realName' =>'real_name',
+        'attendanceCn' =>'attendance_cn'
+    );
     var $id;
 }

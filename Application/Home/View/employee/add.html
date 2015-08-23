@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>考勤数据</title>
+    <?php include_once $_SERVER["DOCUMENT_ROOT"] . "/Public/include/resources.php"; ?>
+</head>
+<body>
+<ul class="breadcrumb">
+    <li><a href="javascript:history.back();">员工管理</a> <span class="divider">/</span></li>
+    <li class="active">添加员工</li>
+</ul>
+<div class="demo-content">
+    <div class="row">
+        <div class="span24">
+            <form id="J_Form" class="form-horizontal" method="post" action="/home/employee/save">
+                <h3>员工信息：</h3>
+                <div class="control-group">
+                    <label class="control-label"><s>*</s>姓名：</label>
+                    <div class="controls">
+                        <input type="text" class="control-text" data-rules="{required:true}" name="realName" />
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">考勤号：</label>
+                    <div class="controls">
+                        <input type="text" class="control-text" name="attendanceCn" />
+                    </div>
+                </div>
+                <div class="form-actions span5 offset3">
+                    <button id="btnSearch" type="submit" class="button button-primary">提交</button>
+                    <button type="reset" class="button button-primary">重置</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    BUI.use('bui/form',function  (Form) {
+        new Form.Form({
+            srcNode : '#J_Form',
+            submitType : 'ajax',
+            callback : function(data){
+                if (edy.ajaxHelp.handleAjax((data))) {
+                    BUI.Message.Alert(data.message || "添加成功");
+                    location.href = "/home/employee/list";
+                }
+            }
+        }).render();
+    });
+</script>
+<!-- script end -->
+</body>
+</html>

@@ -61,4 +61,10 @@ passwod varchar(255) not null
 INSERT INTO `edy_auth_user` (`id`, `username`, `password`) VALUES
 (1, 'gabin', 'a7866023ecac10e3df478ca9567fc64e');
 
+CREATE TABLE `edy_employee` (
+`id` INT(11) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+`real_name` VARCHAR(255) NOT NULL,
+`attendance_cn` VARCHAR(255));
+
+
 

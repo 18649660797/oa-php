@@ -33,4 +33,19 @@ class LoginController extends Controller
         echo json_encode(RenderUtil::success("登录成功！"));
     }
 
+    public function logout() {
+        session_destroy();
+        redirect("/home/login");
+    }
+
+    public function test() {
+        $dao = M("AuthUser");
+        $condition = array();
+        $condition["username"] = array("eq", "gabin");
+        var_dump($condition);
+        $dao->where($condition);
+        $data = $dao -> select();
+        echo json_encode($data);
+    }
+
 }

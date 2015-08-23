@@ -101,38 +101,7 @@ class AttendanceController extends BasicController {
     }
 
     public function data() {
-        $data = M("Attendance");
-        $condition = array();
-        foreach($_REQUEST as $key=>$value){
-            if (strpos($key, "_") > -1) {
-                $arr = explode("_", $key, 2);
-                if (count($arr) == 2) {
-                    switch ($arr[0]) {
-                        case "eq":
-                        case "neq":
-                        case "in":
-                        case "gt":
-                        case "lt":
-                        case "elt":
-                        case "egt":
-                        case "between":
-                            if ($value) {
-                                $condition[$arr[1]] = array($arr[0], $value);
-                            }
-                            break;
-                        case "like":
-                            $condition[$arr[1]] = array($arr[0], "%". $value . "%");
-                            break;
-                    }
-                }
-            }
-        }
-        $data -> where($condition);
-        $data  -> limit(I("start") . "," . I("limit"));
-        $result["rows"] = $data -> select();
-        $count = M("Attendance");
-        $count -> where($condition);
-        $result["results"] = $count -> count();
+        $result = query("Attendance");
         echo json_encode($result);
     }
 
