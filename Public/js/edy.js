@@ -14,5 +14,10 @@
             return true;
         }
     };
+    edy.rendererHelp = {
+        createLink: function(href, text) {
+            return "<a href='{0}'>{1}</a>".replace("{0}", href || "").replace("{1}", text || "");
+        }
+    };
     w.edy = edy;
 } (window, jQuery));

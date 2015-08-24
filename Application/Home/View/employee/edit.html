@@ -8,23 +8,24 @@
 <body>
 <ul class="breadcrumb">
     <li><a href="javascript:history.back();">员工管理</a> <span class="divider">/</span></li>
-    <li class="active">添加员工</li>
+    <li class="active">{$entity?'编辑' : '添加'}员工</li>
 </ul>
 <div class="demo-content">
     <div class="row">
         <div class="span24">
             <form id="J_Form" class="form-horizontal" method="post" action="/home/employee/save">
+                <input type="hidden" name="id" value="{$entity.id}"/>
                 <h3>员工信息：</h3>
                 <div class="control-group">
                     <label class="control-label"><s>*</s>姓名：</label>
                     <div class="controls">
-                        <input type="text" class="control-text" data-rules="{required:true}" name="realName" />
+                        <input type="text" class="control-text" data-rules="{required:true}" name="realName" value="{$entity.real_name}" />
                     </div>
                 </div>
                 <div class="control-group">
                     <label class="control-label">考勤号：</label>
                     <div class="controls">
-                        <input type="text" class="control-text" name="attendanceCn" />
+                        <input type="text" class="control-text" name="attendanceCn" value="{$entity.attendance_cn}" />
                     </div>
                 </div>
                 <div class="form-actions span5 offset3">
@@ -42,7 +43,7 @@
             submitType : 'ajax',
             callback : function(data){
                 if (edy.ajaxHelp.handleAjax((data))) {
-                    BUI.Message.Alert(data.message || "添加成功");
+                    BUI.Message.Alert(data.message || "操作成功");
                     location.href = "/home/employee/list";
                 }
             }

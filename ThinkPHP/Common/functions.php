@@ -1566,11 +1566,23 @@ function query($model) {
                     case "egt":
                     case "between":
                         if ($value) {
-                            $condition[$arr[1]] = array($arr[0], $value);
+                            if ($condition[$arr[1]]) {
+                                $arrT = $condition[$arr[1]];
+                                array_push($arrT, array($arr[0], $value));
+                                $condition[$arr[1]] = $arrT;
+                            } else {
+                                $condition[$arr[1]] = array(array($arr[0], $value));
+                            }
                         }
                         break;
                     case "like":
-                        $condition[$arr[1]] = array($arr[0], "%". $value . "%");
+                        if ($condition[$arr[1]]) {
+                            $arrT = $condition[$arr[1]];
+                            array_push($arrT, array($arr[0], "%". $value . "%"));
+                            $condition[$arr[1]] = $arrT;
+                        } else {
+                            $condition[$arr[1]] = array(array($arr[0], "%". $value . "%"));
+                        }
                         break;
                 }
             }

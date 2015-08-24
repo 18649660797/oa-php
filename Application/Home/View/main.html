@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>main</title>
+    <title>my dear edy</title>
     <?php include_once $_SERVER["DOCUMENT_ROOT"] . "/Public/include/resources.php"; ?>
 </head>
 <body>
@@ -12,9 +12,9 @@
         BUI.use(['bui/layout','bui/tab','bui/data','bui/tree'],function (Layout,Tab,Data,Tree) {
             var nodes = [
                         {text : '管理员设置',id : '1', href: '/home/admin/list'},
-                        {text : '员工管理',id : '1', href: '/home/employee/list'},
-                        {text : '考勤管理',id : '2',expanded : true,children : [
-                            {text : '列表',id : '22',href:'/home/attendance/list'}
+                        {text : '员工管理',id : '2', href: '/home/employee/list'},
+                        {text : '考勤管理',id : '33',expanded : true,children : [
+                            {text : '列表',id : '32',href:'/home/attendance/list'}
                         ]}
                     ];
             var control = new Layout.Viewport({
@@ -22,25 +22,25 @@
                 height:500,
                 elCls : 'ext-border-layout',
                 children : [
-                /*{
+                {
                     layout : {
-                        title : 'north',
+//                        title : 'north',
                         region : 'north',
-                        height : 100
+                        height : 45
                     },
                     xclass : 'controller',
-                    content : "顶部可以放logo，图片"
-                },*/{
+                    content : "<div style='float: right;margin-right:80px;'>登录会员:<?php echo $_SESSION['S_UNAME'] ?><a style='margin-left: 60px;' href='/home/login/logout'>退出登录</a></div>"
+                },{
                     xclass : 'controller',
                     layout : {
                         region : 'south',
-                        title : 'south',
+//                        title : 'south',
                         fit : 'height',
 
-                        height : 50
+                        height : 20
                     },
-                    width : 250,
-                    content : '底部信息'
+                    width : 'auto',
+                    content : '<div style="text-align: center;width:100%;">copy right <b>gabin</b> <a href="mailto:18649660797@163.com">18649660797@163.com</a></div>'
                 },{
                     xclass : 'controller',
                     layout : {

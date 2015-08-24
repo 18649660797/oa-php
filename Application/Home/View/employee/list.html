@@ -19,7 +19,10 @@
                 columns = [
                     {title: 'id', dataIndex: 'id', width: 60},
                     {title: '姓名', dataIndex: 'real_name', width: 60},
-                    {title: '考勤号', dataIndex: 'attendance_cn', width: 60}
+                    {title: '考勤号', dataIndex: 'attendance_cn', width: 60},
+                    {title: '操作', dataIndex: 'id', width: 60, renderer: function(val, row) {
+                        return edy.rendererHelp.createLink("/home/employee/edit?id=" + val, "编辑")
+                    }}
                 ];
             var store = new Store({
                 url : '/index.php/home/employee/data',
@@ -43,28 +46,36 @@
                         text : '<i class="icon-plus"></i>添加',
                         listeners : {
                             'click' : function() {
-                                location.href = "/home/employee/add";
+                                location.href = "/home/employee/edit";
                             }
                         }
                     },
-                        {
-                            btnCls : 'button button-small',
-                            text : '<i class="icon-remove"></i>删除',
-                            listeners : {
-                                'click' : function() {
-                                    var ids = getSelections();
-                                    if (!ids) {
-                                        return edy.alert("至少选择一个记录");
-                                    }
-                                    $.post("/home/employee/delete", {ids: ids}, function(data) {
-                                        if (edy.ajaxHelp.handleAjax(data)) {
-                                            edy.alert("删除成功！");
-                                            reload();
-                                        }
-                                    });
+                    {
+                        btnCls : 'button button-small',
+                        text : '<i class="icon-remove"></i>删除',
+                        listeners : {
+                            'click' : function() {
+                                var ids = getSelections();
+                                if (!ids) {
+                                    return edy.alert("至少选择一个记录");
                                 }
+                                $.post("/home/employee/delete", {ids: ids}, function(data) {
+                                    if (edy.ajaxHelp.handleAjax(data)) {
+                                        edy.alert("删除成功！");
+                                        reload();
+                                    }
+                                });
                             }
-                        }]
+                        }
+                    }, {
+                        btnCls : 'button button-small',
+                        text : '<i class="icon-plus"></i>导入',
+                        listeners : {
+                            'click' : function() {
+                                location.href = "/home/employee/import"
+                            }
+                        }
+                    }]
                 },
                 plugins : [editing,Grid.Plugins.CheckSelection],
             });

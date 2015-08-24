@@ -26,6 +26,7 @@ class LoginController extends Controller
         $user = $loginService -> login($userName, $passWord);
         if ($user) {
             session("S_UID", $user["id"]);
+            session("S_UNAME", $user["username"]);
         } else {
             echo json_encode(RenderUtil::error("登录名或密码错误！"));
             return;
@@ -36,16 +37,6 @@ class LoginController extends Controller
     public function logout() {
         session_destroy();
         redirect("/home/login");
-    }
-
-    public function test() {
-        $dao = M("AuthUser");
-        $condition = array();
-        $condition["username"] = array("eq", "gabin");
-        var_dump($condition);
-        $dao->where($condition);
-        $data = $dao -> select();
-        echo json_encode($data);
     }
 
 }
