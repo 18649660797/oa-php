@@ -13,8 +13,8 @@
             var nodes = [
                         {text : '管理员设置',id : '1', href: '/home/admin/list'},
                         {text : '员工管理',id : '2', href: '/home/employee/list'},
-                        {text : '考勤管理',id : '33',expanded : true,children : [
-                            {text : '列表',id : '32',href:'/home/attendance/list'}
+                        {text : '考勤管理',id : '3',expanded : true,children : [
+                            {text : '考勤数据',id : '31',href:'/home/attendance/list'}
                         ]}
                     ];
             var control = new Layout.Viewport({
@@ -52,7 +52,7 @@
                         width : 150
                     },
                     elCls : 'red',
-                    content : "三 自适应宽高"
+                    content : ""
                 },{
                     layout : {
                         region : 'west',

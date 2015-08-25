@@ -1549,8 +1549,11 @@ function in_array_case($value,$array){
     return in_array(strtolower($value),array_map('strtolower',$array));
 }
 
-function query($model) {
-    $data = M($model);
+function query($model, $relationQuery = false) {
+    $data = D($model);
+    if ($relationQuery) {
+        $data->relation(true);
+    }
     $condition = array();
     foreach($_REQUEST as $key=>$value){
         if (strpos($key, "_") > -1) {

@@ -11,13 +11,13 @@
             <div class="panel-title">
             <span>
                 <label>考勤月：</label>
-                <input type="text" id="J_Month" name="like_work_date">
+                <input type="text" id="J_Month" name="like_work_date" value="2015-05">
             </span>
             </div>
             <ul class="panel-content">
                 <li>
                     <label>姓名：</label>
-                    <input type="text" class="control-text" name="like_name" value="" />
+                    <input type="text" class="control-text" name="like_real_name" value="" />
 
                     <label>打卡日期：</label><input name="between_work_date" type="text" class="calendar" /> <label>至</label> <input name="between_work_date" type="text" class="calendar" />
 
@@ -80,7 +80,9 @@
                     Store = Data.Store,
                     columns = [
 //                        {title: 'id', dataIndex: 'id', width: 60},
-                        {title: '姓名', dataIndex: 'name', width: 60},
+                        {title: '姓名', dataIndex: 'employee', width: 60, renderer: function(val, row) {
+                            return val && val.real_name || "";
+                        }},
                         {title: '部门', dataIndex: 'department', width: 60},
                         {title: '打卡日期', dataIndex: 'work_date', width: 100, renderer: function(val, row) {
                             return val.split(" ")[0];
@@ -117,22 +119,50 @@
                         }}
                     ];
                 var store = new Store({
-                        url : '/index.php/home/attendance/data',
-                        autoLoad:true, //自动加载数据
+                    url : '/index.php/home/attendance/data',
+                    autoLoad:true, //自动加载数据
 //                        params : $("#J_FORM").serialize(),
-                        pageSize:30	// 配置分页数目
-                    }),
-                    grid = new Grid.Grid({
-                        render:'#grid',
-                        columns : columns,
-                        loadMask: true, //加载数据时显示屏蔽层
-                        store: store,
-                        // 底部工具栏
-                        bbar:{
-                            // pagingBar:表明包含分页栏
-                            pagingBar:true
-                        }
-                    });
+                    pageSize:30	// 配置分页数目
+                }),
+                grid = new Grid.Grid({
+                    render:'#grid',
+                    columns : columns,
+                    loadMask: true, //加载数据时显示屏蔽层
+                    store: store,
+                    // 底部工具栏
+                    bbar:{
+                        // pagingBar:表明包含分页栏
+                        pagingBar:true
+                    },
+                    tbar:{ //添加、删除
+                        items : [{
+                            btnCls : 'button button-small',
+                            text : '<i class="icon-plus"></i>初始化月份',
+                            listeners : {
+                                'click' : function() {
+                                    location.href = "/home/attendance/init";
+                                }
+                            }
+                        },{
+                            btnCls : 'button button-small',
+                            text : '<i class="icon-plus"></i>导入',
+                            listeners : {
+                                'click' : function() {
+                                    location.href = "/home/attendance/view";
+                                }
+                            }
+                        },
+                        {
+                            btnCls : 'button button-small',
+                            text : '<i class="icon-remove"></i>删除',
+                            listeners : {
+                                'click' : function() {
+                                    location.href = "/home/attendance/drop";
+                                }
+                            }
+                        }]
+                    },
+                });
                 grid.render();
 
                 var form = new BUI.Form.HForm({

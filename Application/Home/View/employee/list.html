@@ -20,6 +20,7 @@
                     {title: 'id', dataIndex: 'id', width: 60},
                     {title: '姓名', dataIndex: 'real_name', width: 60},
                     {title: '考勤号', dataIndex: 'attendance_cn', width: 60},
+                    {title: '部门', dataIndex: 'department', width: 100},
                     {title: '操作', dataIndex: 'id', width: 60, renderer: function(val, row) {
                         return edy.rendererHelp.createLink("/home/employee/edit?id=" + val, "编辑")
                     }}

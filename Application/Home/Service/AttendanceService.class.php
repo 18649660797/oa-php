@@ -10,4 +10,5 @@ namespace Home\Service;
 interface AttendanceService
 {
     function upload();
+    function init($month);
 }

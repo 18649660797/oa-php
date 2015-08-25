@@ -8,14 +8,11 @@ use Think\Model;
  * Date: 15/8/15
  * Time: 下午4:21
  */
-class Attendance extends Model
+class EmployeeModel extends Model
 {
     protected $_map = array(
-        'workDate' =>'work_date',
-        'amTime'  =>'am_time',
-        'pmTime'  =>'pm_time',
+        'realName' =>'real_name',
+        'attendanceCn' =>'attendance_cn'
     );
-    var $name;
     var $id;
-    var $department;
 }

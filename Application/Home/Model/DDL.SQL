@@ -1,6 +1,6 @@
-CREATE TABLE `EDY_ATTENDANCE`(
+CREATE TABLE `edy_attendance`(
 `id` INT PRIMARY KEY AUTO_INCREMENT,
-`name` VARCHAR(255) NOT NULL,
+`e_id` INT,
 `department` VARCHAR(255),
 `work_date` TIMESTAMP,
 `am_time` TIMESTAMP,
@@ -66,5 +66,4 @@ CREATE TABLE `edy_employee` (
 `real_name` VARCHAR(255) NOT NULL,
 `attendance_cn` VARCHAR(255));
 
-
-
+ALTER TABLE `edy_employee` ADD `department` VARCHAR(255)  NULL  DEFAULT NULL;

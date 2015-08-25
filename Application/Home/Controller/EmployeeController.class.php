@@ -95,16 +95,24 @@ class EmployeeController extends Controller
             $data = array();
             $attendanceCn = $currentSheet -> getCell("A$currentRow") -> getValue();
             $realName = $currentSheet -> getCell("B$currentRow") -> getValue();
-            $realName = iconv('utf-8','gbk', $realName);
-            $realName = iconv('gbk','utf-8', $realName);
+            $department = $currentSheet -> getCell("D$currentRow") -> getValue();
+            $realName = $this -> encode($realName);
+            $department = $this -> encode($department);
             $data["attendance_cn"] = $attendanceCn;
             $data["real_name"] = $realName;
+            $data["department"] = $department;
             if ($data["real_name"] && !$jsonTmp[$data["real_name"]]) {
                 $jsonTmp[$data["real_name"]] = 1;
                 $attendance -> add($data);
             }
         }
         redirect("list");
+    }
+
+    function encode($str) {
+        $str = iconv('utf-8','gbk', $str);
+        $str = iconv('gbk','utf-8', $str);
+        return $str;
     }
 
 }
