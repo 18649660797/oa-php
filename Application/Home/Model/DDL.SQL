@@ -56,8 +56,8 @@ INSERT INTO `edy_auth_group_access` (`uid`, `group_id`) VALUES ('1', '1');
 CREATE TABLE `edy_auth_user` (
 id INT(11) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
 username varchar(255) not null,
-passwod varchar(255) not null
-);
+password varchar(255) not null
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 INSERT INTO `edy_auth_user` (`id`, `username`, `password`) VALUES
 (1, 'gabin', 'a7866023ecac10e3df478ca9567fc64e');
 
