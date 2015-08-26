@@ -5,9 +5,13 @@
     <?php include_once $_SERVER["DOCUMENT_ROOT"] . "/Public/include/resources.php"; ?>
 </head>
 <body>
-<form id="J_Form" action="/index.php/home/attendance/upload" method="post" enctype="multipart/form-data" class="form-horizontal">
+<ul class="breadcrumb">
+    <li><a href="javascript:history.back();">考勤管理</a> <span class="divider">/</span></li>
+    <li class="active">导入考勤数据</li>
+</ul>
+<form id="J_Form" action="/index.php/home/attendance/import" method="post" enctype="multipart/form-data" class="form-horizontal">
     <div class="control-group">
-        <label class="control-label">Filename：</label>
+        <label class="control-label">考勤初始文件：</label>
         <div class="controls">
             <input type="file" name="file" id="file" data-rules="{required:true}" /><br>
         </div>

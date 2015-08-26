@@ -1,19 +1,11 @@
-CREATE TABLE `edy_attendance`(
-`id` INT PRIMARY KEY AUTO_INCREMENT,
-`e_id` INT,
-`department` VARCHAR(255),
-`work_date` TIMESTAMP,
-`am_time` TIMESTAMP,
-`pm_time` TIMESTAMP)
-ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
+DROP DATABASE edy;
+CREATE DATABASE edy;
+USE edy;
 -- ----------------------------
 -- think_auth_rule，规则表，
 -- id:主键，name：规则唯一标识, title：规则中文名称 status 状态：为1正常，为0禁用，condition：规则表达式，为空表示存在就验证，不为空表示按照条件验证
 -- ----------------------------
 DROP TABLE IF EXISTS `edy_auth_rule`;
-DROP TABLE IF EXISTS `edy_auth_group`;
-DROP TABLE IF EXISTS `edy_auth_group_access`;
 CREATE TABLE `edy_auth_rule` (
     `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
     `name` char(80) NOT NULL DEFAULT '',
@@ -28,7 +20,7 @@ CREATE TABLE `edy_auth_rule` (
 -- think_auth_group 用户组表，
 -- id：主键， title:用户组中文名称， rules：用户组拥有的规则id， 多个规则","隔开，status 状态：为1正常，为0禁用
 -- ----------------------------
-
+DROP TABLE IF EXISTS `edy_auth_group`;
 CREATE TABLE `edy_auth_group` (
     `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
     `title` char(100) NOT NULL DEFAULT '',
@@ -40,7 +32,7 @@ CREATE TABLE `edy_auth_group` (
 -- think_auth_group_access 用户组明细表
 -- uid:用户id，group_id：用户组id
 -- ----------------------------
-
+DROP TABLE IF EXISTS `edy_auth_group_access`;
 CREATE TABLE `edy_auth_group_access` (
     `uid` mediumint(8) unsigned NOT NULL,
     `group_id` mediumint(8) unsigned NOT NULL,
@@ -48,22 +40,50 @@ CREATE TABLE `edy_auth_group_access` (
     KEY `uid` (`uid`),
     KEY `group_id` (`group_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+-- ----------------------------
+-- 管理员表
+-- ----------------------------
+DROP TABLE IF EXISTS `edy_auth_user`;
+CREATE TABLE `edy_auth_user` (
+`id` INT(11) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+`username` varchar(255) not null,
+`password` varchar(255) not null
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 INSERT INTO `edy_auth_rule` (`id`, `name`, `title`, `type`, `status`, `condition`) VALUES ('1', 'super', '超级权限', '1', '1', 'true');
-INSERT INTO `edy_auth_group` (`id`, `title`, `status`, `rules`) VALUES (NULL, '超级管理员', '1', '1');
+INSERT INTO `edy_auth_group` (`id`, `title`, `status`, `rules`) VALUES (1, '超级管理员', '1', '1');
 INSERT INTO `edy_auth_group_access` (`uid`, `group_id`) VALUES ('1', '1');
-
-CREATE TABLE `edy_auth_user` (
-id INT(11) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
-username varchar(255) not null,
-password varchar(255) not null
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 INSERT INTO `edy_auth_user` (`id`, `username`, `password`) VALUES
 (1, 'gabin', 'a7866023ecac10e3df478ca9567fc64e');
-
+-- ----------------------------------
+-- 员工表
+-- ----------------------------------
+DROP TABLE IF EXISTS `edy_employee`;
 CREATE TABLE `edy_employee` (
 `id` INT(11) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
 `real_name` VARCHAR(255) NOT NULL,
-`attendance_cn` VARCHAR(255));
-
-ALTER TABLE `edy_employee` ADD `department` VARCHAR(255)  NULL  DEFAULT NULL;
+`attendance_cn` VARCHAR(255),
+`department` VARCHAR(255))
+ENGINE=InnoDB DEFAULT CHARSET=utf8;
+-- ----------------------------------
+-- 考勤数据表
+-- ----------------------------------
+DROP TABLE IF EXISTS `edy_attendance`;
+CREATE TABLE `edy_attendance`(
+`id` INT PRIMARY KEY AUTO_INCREMENT,
+`e_id` INT,
+`work_date`VARCHAR(255),
+`am_time` VARCHAR(255),
+`pm_time` VARCHAR(255),
+`status` TINYINT(1)  NOT NULL  DEFAULT '1'
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+-- ----------------------------------
+-- 异常情况表，目前设计用来存储外出、请假等
+-- ----------------------------------
+DROP TABLE IF EXISTS `edy_exception`;
+CREATE TABLE `edy_exception` (
+`id` INT(11) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+`type` INT(11) NOT NULL DEFAULT 0,
+`begin_time` TIMESTAMP,
+`end_time` TIMESTAMP
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;

@@ -9,6 +9,7 @@
     <div class="row">
         <form id="J_FORM" class="form-panel" action="data" method="post">
             <input type="hidden" name="join" value="edy_employee on edy_employee.id = edy_attendance.e_id"/>
+            <input type="hidden" name="eq_status" value="1"/>
             <div class="panel-title">
             <span>
                 <label>考勤月：</label>
@@ -35,12 +36,22 @@
                     </select>
                 </li>
                 <li>
+                    <label class="control-text">迟到：</label><input type="checkbox" name="gt_am_time" value="09:00" />
+                    <label class="control-text">早退：</label><input type="checkbox" name="lt_pm_time" value="18:00" />
+                </li>
+                <li>
                     <button type="submit" class="button button-primary">查询>></button>
                 </li>
             </ul>
         </form>
     </div>
     <div id="grid"></div>
+    <div id="calendarDiv">
+        <div id="s1">
+            <input type="hidden" id="hide" value="" name="hide">
+        </div>
+        <div id="calendar"></div>
+    </div>
 <script>
     (function($) {
         $(function() {
@@ -82,16 +93,16 @@
                     columns = [
 //                        {title: 'id', dataIndex: 'id', width: 60},
                         {title: '姓名', dataIndex: 'real_name', width: 60},
-                        {title: '部门', dataIndex: 'department', width: 100},
-                        {title: '打卡日期', dataIndex: 'work_date', width: 100, renderer: function(val, row) {
-                            return val.split(" ")[0];
-                        }},
-                        {title: '上午打卡', dataIndex: 'am_time', width: 150},
-                        {title: '下午打卡', dataIndex: 'pm_time', width: 150},
+                        {title: '部门', dataIndex: 'department', width: 80},
+                        {title: '打卡日期', dataIndex: 'work_date', width: 100},
+                        {title: '上午打卡', dataIndex: 'am_time', width: 80},
+                        {title: '下午打卡', dataIndex: 'pm_time', width: 80},
                         {title: '迟到', dataIndex: 'am_time', width: 60, renderer: function(val, row) {
+                            if (!val) {
+                                return "";
+                            }
                             var result = "";
-                            var amTime = row["am_time"];
-                            var amArr= amTime.split(" ")[1].split(":");
+                            var amArr= val.split(":");
                             var basicAmH = 9, basicAmM = 0;
                             var amRule = (amArr[0] - basicAmH) * 60 + (amArr[1] - basicAmM);
                             if (amRule >  0) {
@@ -100,9 +111,11 @@
                             return result;
                         }},
                         {title: '早退', dataIndex: 'pm_time', width: 60, renderer: function(val, row) {
+                            if (!val) {
+                                return "";
+                            }
                             var result = "";
-                            var pmTime = val;
-                            var pmArr = pmTime.split(" ")[1].split(":");
+                            var pmArr = val.split(":");
                             var basicPmH = 18, basicPmM = 0;
                             var pmRule = (basicPmH - pmArr[0]) * 60 + (basicPmM - pmArr[1]);
                             if (pmRule >  0) {
@@ -115,7 +128,10 @@
                         }},
                         {title: '请假', dataIndex: 'remark', width: 60, renderer: function(val, row) {
                             return (row["am_time"] || row["pm_time"]) ? "" : "是";
-                        }}
+                        }}/*,
+                        {title: '是否有效', dataIndex: 'status', width: 100, renderer: function(val, row) {
+                            return (val == 1) && "有效" || "无效";
+                        }}*/
                     ];
                 var store = new Store({
                     url : '/index.php/home/attendance/data',
@@ -147,7 +163,7 @@
                             text : '<i class="icon-plus"></i>导入',
                             listeners : {
                                 'click' : function() {
-                                    location.href = "/home/attendance/view";
+                                    location.href = "/home/attendance/upload";
                                 }
                             }
                         },
@@ -157,6 +173,76 @@
                             listeners : {
                                 'click' : function() {
                                     location.href = "/home/attendance/drop";
+                                }
+                            }
+                        },
+                        {
+                            btnCls : 'button button-small',
+                            text : '<i class="icon-remove"></i>过滤节假日',
+                            listeners : {
+                                'click' : function() {
+                                    var Select = BUI.Select, select, month = $("#J_Month").val(), calendar;
+                                    if (!month) {
+                                        return edy.alert("请选择一个考勤月");
+                                    }
+                                    $.post("/index.php/home/attendance/getDays", {month: month}, function(data) {
+                                        var items = data;
+                                        select = new Select.Combox({
+                                            render:'#s1',
+                                            showTag:true,
+                                            limit : 3, //限制最多3个
+                                            width: 500,
+                                            valueField : '#hide',//显示tag的Combox必须存在valueField
+                                            items:items,
+                                            forbitInput : true, //只能从列表中选择，输入无效,一般用于suggest中
+                                            tagFormatter : function(value){ //将id : text中的id去掉
+                                                var arr = value.split(':');
+
+                                                return arr[1]; //用户输入
+                                            },
+                                            list : { //自定义列表
+                                                textGetter : function(item){
+                                                    return item.id + ':' + item.text;
+                                                },
+                                                idField : 'id' //默认是value
+                                            }
+                                        });
+                                        select.render();
+                                        var Calendar = BUI.Calendar;
+                                        calendar = new Calendar.Calendar({
+                                            render:'#calendar',
+                                        });
+                                        calendar.render();
+                                        calendar.on('selectedchange',function (ev) {
+                                            var _tmp_ = function(val) {
+                                                return val > 10 ? val : "0" + val;
+                                            };
+                                            var date = new Date(ev.date);
+                                            date = date.getFullYear() + "-" + _tmp_(date.getMonth() + 1) + "-" + _tmp_(date.getDate());
+                                            select.setSelectedValue(date);
+                                        });
+                                    });
+                                    new BUI.Overlay.Dialog({
+                                        closeAction: "destroy",
+                                        title: "过滤节假日",
+                                        width: 580,
+                                        height: 250,
+                                        contentId: "calendarDiv",
+                                        success: function() {
+                                            var days = $("#hide").val();
+                                            $.post("/index.php/home/attendance/unsetDays", {days:days}, function(data) {
+
+                                            });
+                                            select.destroy();
+                                            calendar.destroy();
+                                            this.close();
+                                        },
+                                        cancel: function() {
+                                            select.destroy();
+                                            calendar.destroy();
+                                            this.close();
+                                        }
+                                    }).show();
                                 }
                             }
                         }]

@@ -5,9 +5,13 @@
     <?php include_once $_SERVER["DOCUMENT_ROOT"] . "/Public/include/resources.php"; ?>
 </head>
 <body>
+<ul class="breadcrumb">
+    <li><a href="javascript:history.back();">考勤管理</a> <span class="divider">/</span></li>
+    <li class="active">初始化月份</li>
+</ul>
 <form id="J_Form" action="/index.php/home/attendance/initMonth" method="post" enctype="multipart/form-data" class="form-horizontal">
     <div class="control-group">
-        <label class="control-label">月份：</label>
+        <label class="control-label">初始化月份：</label>
         <div class="controls">
             <input type="text" id="J_Month" name="month">
         </div>
@@ -34,6 +38,9 @@
                     success: function () {
                         var month = this.get('month'),
                                 year = this.get('year');
+                        if (!year || !month) {
+                            return edy.alert("请选择一个月份");
+                        }
                         inputEl.val(year + '-' + (++month < 10 ? '0' + month : month));//月份从0开始，11结束
                         this.hide();
                     }
@@ -58,7 +65,7 @@
                 callback: function (data) {
                     if (edy.ajaxHelp.handleAjax((data))) {
                         BUI.Message.Alert("操作成功");
-                        location.href = "/home/attendance/list";
+                        location.href = "/index.php/home/attendance/list";
                     }
                 }
             }).render();

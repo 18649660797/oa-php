@@ -9,17 +9,13 @@
 namespace Home\Controller;
 
 use Home\Service\AttendanceServiceImpl;
+use Home\Utils\DateUtils;
 use Home\Utils\ExcelUtils;
 use Home\Utils\RenderUtil;
 
 class AttendanceController extends BasicController
 {
-    public function view()
-    {
-        $this->display(T("attendance/upload"));
-    }
-
-    public function upload()
+    public function import()
     {
         $thread = new AttendanceServiceImpl();
         $thread->import();
@@ -83,6 +79,33 @@ class AttendanceController extends BasicController
             $dao->where(array("work_date" => array("like", "$month%")))->delete();
             echo json_encode(RenderUtil::success());
         }
+    }
+
+    public function getDays($month)
+    {
+        header("Content-type: application/json");
+        $result = array();
+        foreach (DateUtils::getDaysByMonth($month) as $one) {
+            $result[] = array("text" => $one, "id" => $one, "value" => $one);
+        }
+        echo json_encode($result);
+    }
+
+    public function unsetDays($days)
+    {
+//        header("Content-type: application/json");
+        $dao = M("Attendance");
+        $inArray = array();
+        $days = explode(",", $days);
+        for ($i = 0; $i < count($days); $i++) {
+            $inArray[] = $days[$i] . " 00:00:00";
+        }
+        $condition = array();
+        $condition["work_date"] = array("in", join(",", $days));
+        $dao->status = 0;
+        $dao->where($condition);
+        $dao->save();
+        echo json_encode(RenderUtil::success());
     }
 
 

@@ -25,4 +25,5 @@ class AttendanceModel extends RelationModel
     var $am_time;
     var $pm_time;
     var $id;
+    var $status;
 }

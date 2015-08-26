@@ -44,7 +44,6 @@ class AttendanceServiceImpl implements AttendanceService
             $attendanceCn = $currentSheet->getCell("A$currentRow")->getValue();
             $realName = $currentSheet->getCell("B$currentRow")->getValue();
             $workDate = $currentSheet->getCell("E$currentRow")->getValue();
-            $workDate = $val = date('Y-m-d', strtotime($workDate));
             $am1 = $currentSheet->getCell("G$currentRow")->getValue();
             $am2 = $currentSheet->getCell("H$currentRow")->getValue();
             $pm1 = $currentSheet->getCell("I$currentRow")->getValue();
@@ -58,18 +57,12 @@ class AttendanceServiceImpl implements AttendanceService
                     $data["am_time"] = $pm1;
                 }
             }
-            if ($data["am_time"]) {
-                $data["am_time"] = date("Y-m-d H:i:s", strtotime($workDate . $data["am_time"]));
-            }
             $data["pm_time"] = $pm2;
             if (!$data["pm_time"]) {
                 $data["pm_time"] = $pm1;
                 if (!$data["pm_time"]) {
                     $data["pm_time"] = $am2;
                 }
-            }
-            if ($data["pm_time"]) {
-                $data["pm_time"] = date("Y-m-d H:i:s", strtotime($workDate . $data["pm_time"] . ":00"));
             }
             $data["attendanceCn"] = $attendanceCn;
             $dataList[] = $data;
@@ -82,7 +75,7 @@ class AttendanceServiceImpl implements AttendanceService
         $dao2 = M("Attendance");
         foreach ($attendanceList as $one) {
             foreach ($dataList as $data) {
-                if ($one["attendance_cn"] == $data["attendanceCn"] && $one["work_date"] == $data["work_date"] . " 00:00:00") {
+                if ($one["attendance_cn"] == $data["attendanceCn"] && $one["work_date"] == $data["work_date"]) {
                     if ($data["am_time"]) {
                         $one["am_time"] = $data["am_time"];
                     }
@@ -98,15 +91,15 @@ class AttendanceServiceImpl implements AttendanceService
     function init($month)
     {
         $days = DateUtils::getDaysByMonth($month);
-        $employees = M("Employee") -> order("attendance_cn asc") -> select();
+        $employees = M("Employee")->order("attendance_cn asc")->select();
         $dao = M("Attendance");
         foreach ($employees as $employee) {
             foreach ($days as $day) {
-            $data = array();
-            $data["name"];
-            $data["e_id"] = $employee["id"];
-            $data["work_date"] = $day;
-            $dao->add($data);
+                $data = array();
+                $data["name"];
+                $data["e_id"] = $employee["id"];
+                $data["work_date"] = $day;
+                $dao->add($data);
             }
         }
     }

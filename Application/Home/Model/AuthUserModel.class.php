@@ -11,7 +11,7 @@ namespace Home\Model;
 
 use Think\Model;
 
-class AuthUser extends Model
+class AuthUserModel extends Model
 {
     var $id;
     var $useranme;
