@@ -1551,9 +1551,36 @@ function in_array_case($value,$array){
 
 function query($model, $relationQuery = false) {
     $data = D($model);
+    if (I("join")) {
+        $data -> join(I("join"));
+    }
     if ($relationQuery) {
         $data->relation(true);
     }
+    $condition = condition();
+    $data -> where($condition);
+    $data  -> limit(I("start") . "," . I("limit"));
+    $result["rows"] = $data -> select();
+    $result["results"] = getCount($model, $relationQuery);
+    return $result;
+}
+
+function getCount($model, $relationQuery = false) {
+    $data = D($model);
+    if (I("join")) {
+        $data -> join(I("join"));
+    }
+    if ($relationQuery) {
+        $data->relation(true);
+    }
+    $condition = condition();
+    $data -> where($condition);
+    $count = $data -> count();
+    return $count;
+}
+
+
+function condition() {
     $condition = array();
     foreach($_REQUEST as $key=>$value){
         if (strpos($key, "_") > -1) {
@@ -1591,11 +1618,5 @@ function query($model, $relationQuery = false) {
             }
         }
     }
-    $data -> where($condition);
-    $data  -> limit(I("start") . "," . I("limit"));
-    $result["rows"] = $data -> select();
-    $count = M($model);
-    $count -> where($condition);
-    $result["results"] = $count -> count();
-    return $result;
+    return $condition;
 }

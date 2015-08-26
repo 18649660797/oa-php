@@ -18,14 +18,11 @@ class AttendanceModel extends RelationModel
             'relation_foreign_key' => 'e_id',
 //            'mapping_name'  => 'employee'
             // 定义更多的关联属性
-//            'as_fields' => 'real_name,nickname',
+            'as_fields' => 'real_name,department,attendance_cn',
             )
         );
-    protected $_map = array(
-        'workDate' =>'work_date',
-        'amTime'  =>'am_time',
-        'pmTime'  =>'pm_time',
-    );
+    var $work_date;
+    var $am_time;
+    var $pm_time;
     var $id;
-    var $department;
 }

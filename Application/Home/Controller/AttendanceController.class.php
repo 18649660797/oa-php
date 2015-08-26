@@ -9,7 +9,6 @@
 namespace Home\Controller;
 
 use Home\Service\AttendanceServiceImpl;
-use Home\Thread\ImportAttendance;
 use Home\Utils\ExcelUtils;
 use Home\Utils\RenderUtil;
 
@@ -22,8 +21,8 @@ class AttendanceController extends BasicController
 
     public function upload()
     {
-        $thread = new ImportAttendance();
-        $thread -> run();
+        $thread = new AttendanceServiceImpl();
+        $thread->import();
         redirect("list");
     }
 
