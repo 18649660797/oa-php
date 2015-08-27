@@ -93,12 +93,12 @@ class AttendanceController extends BasicController
 
     public function unsetDays($days)
     {
-//        header("Content-type: application/json");
+        header("Content-type: application/json");
         $dao = M("Attendance");
         $inArray = array();
-        $days = explode(",", $days);
+        $days = explode(";", $days);
         for ($i = 0; $i < count($days); $i++) {
-            $inArray[] = $days[$i] . " 00:00:00";
+            $inArray[] = $days[$i];
         }
         $condition = array();
         $condition["work_date"] = array("in", join(",", $days));

@@ -29,7 +29,7 @@ class BasicController extends Controller
         }
         $r = $auth-> check("super", session("S_UID"));
         if(!$r){
-            $this->error('没有权限！', 3);
+            $this->error('没有权限！', "/index.php/home/login");
         }
     }
 }

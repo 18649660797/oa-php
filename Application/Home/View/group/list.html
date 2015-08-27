@@ -8,10 +8,11 @@
 <body>
 <div class="row">
     <form id="J_FORM" class="form-panel" action="data" method="post">
+        <input type="hidden" name="status" value="1"/>
         <ul class="panel-content">
             <li>
                 <label>名称：</label>
-                <input type="text" class="control-text" name="like_username" value="" />
+                <input type="text" class="control-text" name="like_title" value="" />
             </li>
             <li>
                 <button type="submit" class="button button-primary">查询>></button>
@@ -23,20 +24,20 @@
 <script>
     (function($) {
         $(function() {
-            var Grid = BUI.Grid,
-                    Data = BUI.Data;
+            var Grid = BUI.Grid, Data = BUI.Data;
             var Grid = Grid,
                 Store = Data.Store,
                 columns = [
-                    {title: 'id', dataIndex: 'id', width: 60},
-                    {title: '名称', dataIndex: 'username', width: 60},
+                    {title: 'ID', dataIndex: 'id', width: 60},
+                    {title: '角色', dataIndex: 'title', width: 100},
                     {title: '操作', dataIndex: 'id', width: 100, renderer: function(val, row) {
-                        return edy.rendererHelp.createLink("/index.php/home/admin/edit?id=" + val, "编辑");
+                        return edy.rendererHelp.createLink("/index.php/home/group/edit?id=" + val, "编辑");
                     }}
                 ];
             var store = new Store({
-                url : '/index.php/home/admin/data',
+                url : '/index.php/home/group/data',
                 autoLoad:true, //自动加载数据
+//                        params : $("#J_FORM").serialize(),
                 pageSize:30	// 配置分页数目
             }),
             editing = new Grid.Plugins.CellEditing({
@@ -58,7 +59,7 @@
                         text : '<i class="icon-plus"></i>添加',
                         listeners : {
                             'click' : function() {
-                                location.href = "/index.php/home/admin/edit";
+                                location.href = "/index.php/home/group/edit";
                             }
                         }
                     },
@@ -71,7 +72,7 @@
                                 if (!ids) {
                                     return edy.alert("至少选择一个记录");
                                 }
-                                $.post("/index.php/home/admin/delete", {ids: ids}, function(data) {
+                                $.post("/index.php/home/group/delete", {ids: ids}, function(data) {
                                     if (edy.ajaxHelp.handleAjax(data)) {
                                         edy.alert("删除成功！");
                                         reload();
