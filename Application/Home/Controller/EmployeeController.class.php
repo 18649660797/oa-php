@@ -18,6 +18,10 @@ class EmployeeController extends Controller
         $this->display(T("employee/list"));
     }
 
+    public function import() {
+        $this->display(T("employee/import"));
+    }
+
     public function data() {
         $result = query("Employee");
         echo json_encode($result);

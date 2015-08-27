@@ -55,6 +55,21 @@ class AttendanceController extends BasicController
         $this->display(T("attendance/list"));
     }
 
+    public function init()
+    {
+        $this->display(T("attendance/init"));
+    }
+
+    public function drop()
+    {
+        $this->display(T("attendance/drop"));
+    }
+
+    public function upload()
+    {
+        $this->display(T("attendance/upload"));
+    }
+
     function GetData($val)
     {
         $jd = GregorianToJD(1, 1, 1970);
