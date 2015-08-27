@@ -13,6 +13,10 @@ use Home\Utils\RenderUtil;
 
 class AdminController extends BasicController
 {
+    public function viewList() {
+        $this->display(T("admin/list"));
+    }
+
     public function data()
     {
         echo json_encode(query("AuthUser"));

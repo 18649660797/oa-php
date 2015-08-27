@@ -13,6 +13,10 @@ use Home\Utils\RenderUtil;
 
 class GroupController extends BasicController
 {
+    public function viewList() {
+        $this->display(T("group/list"));
+    }
+
     public function data()
     {
         echo json_encode(query("AuthGroup"));

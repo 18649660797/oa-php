@@ -19,7 +19,7 @@ class AttendanceController extends BasicController
     {
         $thread = new AttendanceServiceImpl();
         $thread->import();
-        redirect("list");
+        redirect("viewList");
     }
 
     public function excel()
