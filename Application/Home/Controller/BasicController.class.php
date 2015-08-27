@@ -22,14 +22,24 @@ class BasicController extends Controller
 
     private function checkRight(){
         $auth= new Auth();
-//        session("S_UID", 1);
         if (!session("S_UID")) {
             redirect("/index.php/home/login");
             return;
         }
         $r = $auth-> check("super", session("S_UID"));
         if(!$r){
-            $this->error('没有权限！', "/index.php/home/login");
+            $uri = $_SERVER["PHP_SELF"];
+            switch ($uri) {
+                case "/index.php":
+                case "/index.php/home/index/main":
+                    return;
+            }
+            $uri = explode("/", $uri);
+            $url = "/" . $uri[1] . "/"  . $uri[2] . "/" . $uri[3];
+            $flag = $auth-> check($url, session("S_UID"));
+            if (!$flag) {
+                $this->error('没有权限！', "/index.php/home/login");
+            }
         }
     }
 }

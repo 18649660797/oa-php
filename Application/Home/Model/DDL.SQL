@@ -50,7 +50,13 @@ CREATE TABLE `edy_auth_user` (
 `password` varchar(255) not null
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-INSERT INTO `edy_auth_rule` (`id`, `name`, `title`, `type`, `status`, `condition`) VALUES ('1', 'super', '超级权限', '1', '1', 'true');
+INSERT INTO `edy_auth_rule` (`id`, `name`, `title`, `type`, `status`, `condition`)
+VALUES ('1', 'super', '超级权限', '1', '1', 'true'),
+ ('2', '/index.php/home/group', '权限管理', '1', '1', 'true'),
+ ('3', '/index.php/home/attendance', '考勤管理', '1', '1', 'true'),
+ ('4', '/index.php/home/employee', '员工管理', '1', '1', 'true'),
+ ('5', '/index.php/home/admin', '管理员设置', '1', '1', 'true')
+;
 INSERT INTO `edy_auth_group` (`id`, `title`, `status`, `rules`) VALUES (1, '超级管理员', '1', '1');
 INSERT INTO `edy_auth_group_access` (`uid`, `group_id`) VALUES ('1', '1');
 INSERT INTO `edy_auth_user` (`id`, `username`, `password`) VALUES
@@ -82,8 +88,11 @@ CREATE TABLE `edy_attendance`(
 -- ----------------------------------
 DROP TABLE IF EXISTS `edy_exception`;
 CREATE TABLE `edy_exception` (
-`id` INT(11) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
-`type` INT(11) NOT NULL DEFAULT 0,
-`begin_time` TIMESTAMP,
-`end_time` TIMESTAMP
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `type` int(11) NOT NULL DEFAULT '0',
+  `begin_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `end_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `remark` varchar(255) DEFAULT NULL,
+  `e_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

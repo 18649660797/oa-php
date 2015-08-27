@@ -12,7 +12,7 @@ namespace Home\Controller;
 use Home\Utils\RenderUtil;
 use Think\Controller;
 
-class EmployeeController extends Controller
+class EmployeeController extends BasicController
 {
     public function viewList() {
         $this->display(T("employee/list"));

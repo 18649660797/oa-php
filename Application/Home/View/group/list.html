@@ -37,7 +37,7 @@
             var store = new Store({
                 url : '/index.php/home/group/data',
                 autoLoad:true, //自动加载数据
-//                        params : $("#J_FORM").serialize(),
+                params: {gt_id: 2},
                 pageSize:30	// 配置分页数目
             }),
             editing = new Grid.Plugins.CellEditing({

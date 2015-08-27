@@ -54,7 +54,7 @@ class GroupController extends BasicController
     public function getRules()
     {
         header("Content-type: application/json");
-        $dataList = M("AuthRule")->select();
+        $dataList = M("AuthRule")->order("id")->select();
         $result = array();
         foreach ($dataList as $one) {
             $result[] = array("id" => $one["id"], "value" => $one["id"], "text" => $one["title"]);

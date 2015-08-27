@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>考勤数据</title>
+    <?php include_once $_SERVER["DOCUMENT_ROOT"] . "/Public/include/resources.php"; ?>
+</head>
+<body>
+<ul class="breadcrumb">
+    <li><a href="javascript:history.back();">考勤异常登记</a> <span class="divider">/</span></li>
+    <li class="active">{$entity?'编辑' : '添加'}记录</li>
+</ul>
+<div class="demo-content">
+    <div class="row">
+        <div class="span24">
+            <form id="J_Form" class="form-horizontal" method="post" action="/index.php/home/exception/save">
+                <input type="hidden" name="id" value="{$entity.id}"/>
+                <div class="control-group">
+                    <label class="control-label"><s>*</s>姓名：</label>
+                    <div class="controls">
+                        <div id="s1" data-rules="{required:true}">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label"><s>*</s>类型：</label>
+                    <div class="controls">
+                        <div id="type">
+                            <input id="hide" name="type" type="hidden"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label"><s>*</s>开始时间：</label>
+                    <div class="controls">
+                        <input type="text" data-rules="{required:true}" class="calendar calendar-time" name="begin_time" value="{$entity.begin_time}" />
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label"><s>*</s>结束时间：</label>
+                    <div class="controls">
+                        <input type="text" data-rules="{required:true}" class="calendar calendar-time" name="end_time" value="{$entity.end_time}" />
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">备注：</label>
+                    <div class="controls control-row-auto">
+                        <textarea name="remark" class="control-row4 input-large">{$entity.remark}</textarea>
+                    </div>
+                </div>
+                <div class="form-actions span5 offset3">
+                    <button id="btnSearch" type="submit" class="button button-primary">提交</button>
+                    <button type="reset" class="button button-primary">重置</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    BUI.use('bui/form',function  (Form) {
+        new Form.Form({
+            srcNode : '#J_Form',
+            submitType : 'ajax',
+            callback : function(data){
+                if (edy.ajaxHelp.handleAjax((data))) {
+                    BUI.Message.Alert(data.message || "操作成功");
+                    location.href = "/index.php/home/exception/list";
+                }
+            }
+        }).render();
+        var Select = BUI.Select;
+        var suggest = new Select.Suggest({
+            render:'#s1',
+            name:'name',
+            url:'/index.php/home/exception/getRealNames'
+        });
+        suggest.render();
+        $("[name='name']").val("{$entity.real_name}");
+        var items = [
+            {text:'请假',value:'1'},
+            {text:'调休',value:'2'},
+            {text:'外出',value:'3'}
+        ],
+        select = new Select.Select({
+            render:'#type',
+            valueField:'#hide',
+            items:items
+        });
+        select.render();
+        select.setSelectedValue("{$entity.type}");
+    });
+</script>
+<!-- script end -->
+</body>
+</html>

@@ -2,46 +2,38 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>管理员列表</title>
+    <title>行政登记</title>
     <?php include_once $_SERVER["DOCUMENT_ROOT"] . "/Public/include/resources.php"; ?>
 </head>
 <body>
-<div class="row">
-    <form id="J_FORM" class="form-panel" action="data" method="post">
-        <ul class="panel-content">
-            <li>
-                <label>名称：</label>
-                <input type="text" class="control-text" name="like_username" value="" />
-            </li>
-            <li>
-                <button type="submit" class="button button-primary">查询>></button>
-            </li>
-        </ul>
-    </form>
-</div>
 <div id="grid"></div>
 <script>
     (function($) {
         $(function() {
-            var Grid = BUI.Grid,
-                    Data = BUI.Data;
+            var Grid = BUI.Grid, Data = BUI.Data;
+            var editing = new Grid.Plugins.CellEditing({
+                triggerSelected : false //触发编辑的时候不选中行
+            });
             var Grid = Grid,
                 Store = Data.Store,
                 columns = [
                     {title: 'id', dataIndex: 'id', width: 60},
-                    {title: '名称', dataIndex: 'username', width: 60},
-                    {title: '操作', dataIndex: 'id', width: 100, renderer: function(val, row) {
-                        return edy.rendererHelp.createLink("/index.php/home/admin/edit?id=" + val, "编辑");
+                    {title: '姓名', dataIndex: 'real_name', width: 60},
+                    {title: '类型', dataIndex: 'type', width: 60, renderer: function(val, row) {
+                        return {1:"请假", 2: "调休", 3: "外出"}[val];
+                    }},
+                    {title: '开始日期', dataIndex: 'begin_time', width: 150},
+                    {title: '结束时间', dataIndex: 'end_time', width: 150},
+                    {title: '备注', dataIndex: 'remark', width: 150},
+                    {title: '操作', dataIndex: 'id', width: 60, renderer: function(val, row) {
+                        return edy.rendererHelp.createLink("/index.php/home/exception/edit?id=" + val, "编辑")
                     }}
                 ];
             var store = new Store({
-                url : '/index.php/home/admin/data',
-                params: {gt_id: 2},
+                url : '/index.php/home/exception/data',
                 autoLoad:true, //自动加载数据
+//                        params : $("#J_FORM").serialize(),
                 pageSize:30	// 配置分页数目
-            }),
-            editing = new Grid.Plugins.CellEditing({
-                triggerSelected : false //触发编辑的时候不选中行
             }),
             grid = new Grid.Grid({
                 render:'#grid',
@@ -51,7 +43,7 @@
                 // 底部工具栏
                 bbar:{
                     // pagingBar:表明包含分页栏
-                    pagingBar:true
+                    pagingBar:true,
                 },
                 tbar:{ //添加、删除
                     items : [{
@@ -59,7 +51,7 @@
                         text : '<i class="icon-plus"></i>添加',
                         listeners : {
                             'click' : function() {
-                                location.href = "/index.php/home/admin/edit";
+                                location.href = "/index.php/home/exception/edit";
                             }
                         }
                     },
@@ -72,7 +64,7 @@
                                 if (!ids) {
                                     return edy.alert("至少选择一个记录");
                                 }
-                                $.post("/index.php/home/admin/delete", {ids: ids}, function(data) {
+                                $.post("/index.php/home/exception/delete", {ids: ids}, function(data) {
                                     if (edy.ajaxHelp.handleAjax(data)) {
                                         edy.alert("删除成功！");
                                         reload();
@@ -80,16 +72,22 @@
                                 });
                             }
                         }
+                    }, {
+                        btnCls : 'button button-small',
+                        text : '<i class="icon-plus"></i>导入',
+                        listeners : {
+                            'click' : function() {
+                                location.href = "/index.php/home/exception/import"
+                            }
+                        }
                     }]
                 },
                 plugins : [editing,Grid.Plugins.CheckSelection],
             });
             grid.render();
-
             var form = new BUI.Form.HForm({
                 srcNode : '#J_FORM'
             }).render();
-
             form.on('beforesubmit',function(ev) {
                 //序列化成对象
                 var obj = form.serializeToObject();
