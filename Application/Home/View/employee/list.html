@@ -22,7 +22,7 @@
                     {title: '考勤号', dataIndex: 'attendance_cn', width: 60},
                     {title: '部门', dataIndex: 'department', width: 100},
                     {title: '操作', dataIndex: 'id', width: 60, renderer: function(val, row) {
-                        return edy.rendererHelp.createLink("/home/employee/edit?id=" + val, "编辑")
+                        return edy.rendererHelp.createLink("/index.php/home/employee/edit?id=" + val, "编辑")
                     }}
                 ];
             var store = new Store({
@@ -47,7 +47,7 @@
                         text : '<i class="icon-plus"></i>添加',
                         listeners : {
                             'click' : function() {
-                                location.href = "/home/employee/edit";
+                                location.href = "/index.php/home/employee/edit";
                             }
                         }
                     },
@@ -60,7 +60,7 @@
                                 if (!ids) {
                                     return edy.alert("至少选择一个记录");
                                 }
-                                $.post("/home/employee/delete", {ids: ids}, function(data) {
+                                $.post("/index.php/home/employee/delete", {ids: ids}, function(data) {
                                     if (edy.ajaxHelp.handleAjax(data)) {
                                         edy.alert("删除成功！");
                                         reload();
@@ -73,7 +73,7 @@
                         text : '<i class="icon-plus"></i>导入',
                         listeners : {
                             'click' : function() {
-                                location.href = "/home/employee/import"
+                                location.href = "/index.php/home/employee/import"
                             }
                         }
                     }]

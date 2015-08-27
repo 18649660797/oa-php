@@ -13,7 +13,7 @@
 <div class="demo-content">
     <div class="row">
         <div class="span24">
-            <form id="J_Form" class="form-horizontal" method="post" action="/home/employee/save">
+            <form id="J_Form" class="form-horizontal" method="post" action="/index.php/home/employee/save">
                 <input type="hidden" name="id" value="{$entity.id}"/>
                 <h3>员工信息：</h3>
                 <div class="control-group">
@@ -44,7 +44,7 @@
             callback : function(data){
                 if (edy.ajaxHelp.handleAjax((data))) {
                     BUI.Message.Alert(data.message || "操作成功");
-                    location.href = "/home/employee/list";
+                    location.href = "/index.php/home/employee/list";
                 }
             }
         }).render();
