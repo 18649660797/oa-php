@@ -11,13 +11,13 @@
     <script type="text/javascript">
         BUI.use(['bui/layout','bui/tab','bui/data','bui/tree'],function (Layout,Tab,Data,Tree) {
             var nodes = [
-                {text : '权限管理',id : '1', href: '/home/admin/list', expanded: true, children: [
-                    {text : '角色设置',id : '11',href:'/home/group/list'},
-                    {text : '管理员设置',id : '12',href:'/home/admin/list'}
+                {text : '权限管理',id : '1', href: '/index.php/home/admin/list', expanded: true, children: [
+                    {text : '角色设置',id : '11',href:'/index.php/home/group/list'},
+                    {text : '管理员设置',id : '12',href:'/index.php/home/admin/list'}
                 ]},
-                {text : '员工管理',id : '2', href: '/home/employee/list'},
+                {text : '员工管理',id : '2', href: '/index.php/home/employee/list'},
                 {text : '考勤管理',id : '3', expanded: true, children : [
-                    {text : '考勤数据',id : '31',href:'/home/attendance/list'}
+                    {text : '考勤数据',id : '31',href:'/index.php/home/attendance/list'}
                 ]}
             ];
             var control = new Layout.Viewport({
