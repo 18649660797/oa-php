@@ -7,39 +7,35 @@
 </head>
 <body>
     <div class="row">
-        <form id="J_FORM" class="form-panel" action="data" method="post">
+        <form id="J_FORM" class="form-panel" action="data" method="post" style="margin-bottom:0;">
             <input type="hidden" name="join" value="edy_employee on edy_employee.id = edy_attendance.e_id"/>
             <input type="hidden" name="eq_status" value="1"/>
             <div class="panel-title">
             <span>
                 <label>考勤月：</label>
                 <input type="text" id="J_Month" name="like_work_date" value="">
+
+                <label>打卡日期：</label><input name="between_work_date" type="text" class="calendar" /> <label>至</label> <input name="between_work_date" type="text" class="calendar" />
+
+                <label>姓名：</label>
+                <input type="text" class="control-text" name="like_real_name" value="" />
+
+                <label>部门：</label>
+                <select name="eq_department">
+                    <option value="">全部</option>
+                    <option value="产品部">产品部</option>
+                    <option value="开发部">开发部</option>
+                    <option value="运营部">运营部</option>
+                    <option value="销售部">销售部</option>
+                    <option value="市场部">市场部</option>
+                    <option value="行政部">行政部</option>
+                </select>
             </span>
             </div>
             <ul class="panel-content">
                 <li>
-                    <label>姓名：</label>
-                    <input type="text" class="control-text" name="like_real_name" value="" />
-
-                    <label>打卡日期：</label><input name="between_work_date" type="text" class="calendar" /> <label>至</label> <input name="between_work_date" type="text" class="calendar" />
-
-                    <label>部门：</label>
-                    <select name="eq_department">
-                        <option value="">全部</option>
-                        <option value="产品部">产品部</option>
-                        <option value="开发部">开发部</option>
-                        <option value="运营部">运营部</option>
-                        <option value="销售部">销售部</option>
-                        <option value="市场部">市场部</option>
-                        <option value="行政部">行政部</option>
-                        <!--<option value="客服部">客服部</option>-->
-                    </select>
-                </li>
-                <li>
-                    <label class="control-text">迟到：</label><input type="checkbox" name="gt_am_time" value="09:00" />
-                    <label class="control-text">早退：</label><input type="checkbox" name="lt_pm_time" value="18:00" />
-                </li>
-                <li>
+                    <label class="control-text">迟到：</label><input style="width:20px;" type="checkbox" name="gt_am_time" value="09:00" />
+                    <label class="control-text">早退：</label><input style="width:20px;" type="checkbox" name="lt_pm_time" value="18:00" />
                     <button type="submit" class="button button-primary">查询>></button>
                 </li>
             </ul>
@@ -92,12 +88,12 @@
                     Store = Data.Store,
                     columns = [
 //                        {title: 'id', dataIndex: 'id', width: 60},
-                        {title: '姓名', dataIndex: 'real_name', width: 60},
+                        {title: '姓名', dataIndex: 'real_name', width: 80},
                         {title: '部门', dataIndex: 'department', width: 80},
                         {title: '打卡日期', dataIndex: 'work_date', width: 100},
                         {title: '上午打卡', dataIndex: 'am_time', width: 80},
                         {title: '下午打卡', dataIndex: 'pm_time', width: 80},
-                        {title: '迟到', dataIndex: 'am_time', width: 60, renderer: function(val, row) {
+                        {title: '迟到', dataIndex: 'am_time', width: 100, renderer: function(val, row) {
                             if (!val) {
                                 return "";
                             }
@@ -110,7 +106,7 @@
                             }
                             return result;
                         }},
-                        {title: '早退', dataIndex: 'pm_time', width: 60, renderer: function(val, row) {
+                        {title: '早退', dataIndex: 'pm_time', width: 100, renderer: function(val, row) {
                             if (!val) {
                                 return "";
                             }
@@ -127,7 +123,7 @@
                             return (row["am_time"] || row["pm_time"]) ? "" : "是";
                         }},
                         {title: '请假', dataIndex: 'remark', width: 60, renderer: function(val, row) {
-                            return (row["am_time"] || row["pm_time"]) ? "" : "是";
+                            return "";
                         }}/*,
                         {title: '是否有效', dataIndex: 'status', width: 100, renderer: function(val, row) {
                             return (val == 1) && "有效" || "无效";
@@ -137,7 +133,7 @@
                     url : '/index.php/home/attendance/data',
                     autoLoad:true, //自动加载数据
 //                        params : $("#J_FORM").serialize(),
-                    pageSize:30	// 配置分页数目
+                    pageSize:10	// 配置分页数目
                 }),
                 grid = new Grid.Grid({
                     render:'#grid',
