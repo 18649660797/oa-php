@@ -69,4 +69,14 @@ class ExceptionController extends BasicController
         echo json_encode(RenderUtil::success("删除成功！"));
     }
 
+    public function viewImport()
+    {
+        $this->display(T("exception/import"));
+    }
+
+    public function import() {
+
+        redirect("viewList");
+    }
+
 }
