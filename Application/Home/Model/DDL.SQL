@@ -75,14 +75,16 @@ ENGINE=InnoDB DEFAULT CHARSET=utf8;
 -- 考勤数据表
 -- ----------------------------------
 DROP TABLE IF EXISTS `edy_attendance`;
-CREATE TABLE `edy_attendance`(
-`id` INT PRIMARY KEY AUTO_INCREMENT,
-`e_id` INT,
-`work_date`VARCHAR(255),
-`am_time` VARCHAR(255),
-`pm_time` VARCHAR(255),
-`status` TINYINT(1)  NOT NULL  DEFAULT '1'
-)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+CREATE TABLE `edy_attendance` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `e_id` int(11) DEFAULT NULL,
+  `work_date` varchar(255) DEFAULT NULL,
+  `am_time` varchar(255) DEFAULT NULL,
+  `pm_time` varchar(255) DEFAULT NULL,
+  `status` tinyint(1) NOT NULL DEFAULT '1',
+  `remark` text,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=10820 DEFAULT CHARSET=utf8;
 -- ----------------------------------
 -- 异常情况表，目前设计用来存储外出、请假等
 -- ----------------------------------

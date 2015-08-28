@@ -6,6 +6,33 @@
     <?php include_once $_SERVER["DOCUMENT_ROOT"] . "/Public/include/resources.php"; ?>
 </head>
 <body>
+<div class="row">
+    <form id="J_FORM" class="form-panel" action="data" method="post" style="margin-bottom:0;">
+        <div class="panel-title">
+            <span>
+                <label>姓名：</label>
+                <input type="text" class="control-text" name="like_real_name" value="" />
+                <label>部门：</label>
+                <select name="eq_department">
+                    <option value="">全部</option>
+                    <option value="产品部">产品部</option>
+                    <option value="开发部">开发部</option>
+                    <option value="运营部">运营部</option>
+                    <option value="销售部">销售部</option>
+                    <option value="市场部">市场部</option>
+                    <option value="行政部">行政部</option>
+                    <option value="客户中心">客户中心</option>
+                    <option value="云智盛世">云智盛世</option>
+                </select>
+            </span>
+        </div>
+        <ul class="panel-content">
+            <li>
+                <button type="submit" class="button button-primary">查询>></button>
+            </li>
+        </ul>
+    </form>
+</div>
 <div id="grid"></div>
 <script>
     (function($) {

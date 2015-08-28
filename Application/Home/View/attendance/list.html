@@ -29,6 +29,8 @@
                     <option value="销售部">销售部</option>
                     <option value="市场部">市场部</option>
                     <option value="行政部">行政部</option>
+                    <option value="客户中心">客户中心</option>
+                    <option value="云智盛世">云智盛世</option>
                 </select>
             </span>
             </div>
@@ -36,6 +38,7 @@
                 <li>
                     <label class="control-text">迟到：</label><input style="width:20px;" type="checkbox" name="gt_am_time" value="09:00" />
                     <label class="control-text">早退：</label><input style="width:20px;" type="checkbox" name="lt_pm_time" value="18:00" />
+                    <label class="control-text">迟到15分钟内：</label><input style="width:20px;" type="checkbox" name="between_am_time" value="09:00,09:15" />
                     <button type="submit" class="button button-primary">查询>></button>
                 </li>
             </ul>
@@ -93,6 +96,8 @@
                         {title: '打卡日期', dataIndex: 'work_date', width: 100},
                         {title: '上午打卡', dataIndex: 'am_time', width: 80},
                         {title: '下午打卡', dataIndex: 'pm_time', width: 80},
+                        {title: '前日晚卡', dataIndex: 'yesterday', width: 80},
+                        {title: '备注', dataIndex: 'remark', width: 80},
                         {title: '迟到', dataIndex: 'am_time', width: 100, renderer: function(val, row) {
                             if (!val) {
                                 return "";
@@ -124,10 +129,10 @@
                         }},
                         {title: '请假', dataIndex: 'remark', width: 60, renderer: function(val, row) {
                             return "";
-                        }}/*,
-                        {title: '是否有效', dataIndex: 'status', width: 100, renderer: function(val, row) {
-                            return (val == 1) && "有效" || "无效";
-                        }}*/
+                        }},
+                        {title: '操作', dataIndex: 'id', width: 100, renderer: function(val, row) {
+                            return edy.rendererHelp.createLink("/index.php/home/attendance/edit?id=" + val, "编辑")
+                        }}
                     ];
                 var store = new Store({
                     url : '/index.php/home/attendance/data',
@@ -152,6 +157,18 @@
                             listeners : {
                                 'click' : function() {
                                     location.href = "/index.php/home/attendance/init";
+                                }
+                            }
+                        },{
+                            btnCls : 'button button-small',
+                            text : '<i class="icon-plus"></i>导出分析数据',
+                            listeners : {
+                                'click' : function() {
+                                    var Select = BUI.Select, select, month = $("#J_Month").val(), calendar;
+                                    if (!month) {
+                                        return edy.alert("请选择一个考勤月");
+                                    }
+                                    window.open("/index.php/home/attendance/analysis?month=" + month)
                                 }
                             }
                         },{

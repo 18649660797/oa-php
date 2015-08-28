@@ -7,40 +7,42 @@
 </head>
 <body>
 <ul class="breadcrumb">
-    <li><a href="javascript:history.back();">行政登记</a> <span class="divider">/</span></li>
-    <li class="active">{$entity?'编辑' : '添加'}记录</li>
+    <li><a href="javascript:history.back();">员工管理</a> <span class="divider">/</span></li>
+    <li class="active">{$entity?'编辑' : '添加'}员工</li>
 </ul>
 <div class="demo-content">
     <div class="row">
         <div class="span24">
-            <form id="J_Form" class="form-horizontal" method="post" action="/index.php/home/exception/save">
+            <form id="J_Form" class="form-horizontal" method="post" action="/index.php/home/attendance/save">
                 <input type="hidden" name="id" value="{$entity.id}"/>
                 <div class="control-group">
                     <label class="control-label"><s>*</s>姓名：</label>
                     <div class="controls">
-                        <div id="s1" data-rules="{required:true}">
-
-                        </div>
+                        <input readonly type="text" class="control-text" data-rules="{required:true}" name="realName" value="{$entity.real_name}" />
                     </div>
                 </div>
                 <div class="control-group">
-                    <label class="control-label"><s>*</s>类型：</label>
+                    <label class="control-label">考勤号：</label>
                     <div class="controls">
-                        <div id="type">
-                            <input id="hide" name="type" type="hidden"/>
-                        </div>
+                        <input readonly type="text" class="control-text" name="attendanceCn" value="{$entity.attendance_cn}" />
                     </div>
                 </div>
                 <div class="control-group">
-                    <label class="control-label"><s>*</s>开始时间：</label>
+                    <label class="control-label">考勤日期：</label>
                     <div class="controls">
-                        <input type="text" data-rules="{required:true}" class="calendar calendar-time" name="begin_time" value="{$entity.begin_time}" />
+                        <input readonly type="text" class="control-text" name="work_date" value="{$entity.work_date}" />
                     </div>
                 </div>
                 <div class="control-group">
-                    <label class="control-label"><s>*</s>结束时间：</label>
+                    <label class="control-label">上午打卡：</label>
                     <div class="controls">
-                        <input type="text" data-rules="{required:true}" class="calendar calendar-time" name="end_time" value="{$entity.end_time}" />
+                        <input type="text" class="control-text" name="am_time" value="{$entity.am_time}" />
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">下午打卡：</label>
+                    <div class="controls">
+                        <input type="text" class="control-text" name="pm_time" value="{$entity.pm_time}" />
                     </div>
                 </div>
                 <div class="control-group">
@@ -65,31 +67,10 @@
             callback : function(data){
                 if (edy.ajaxHelp.handleAjax((data))) {
                     BUI.Message.Alert(data.message || "操作成功");
-                    location.href = "/index.php/home/exception/list";
+                    location.href = "/index.php/home/attendance/list";
                 }
             }
         }).render();
-        var Select = BUI.Select;
-        var suggest = new Select.Suggest({
-            render:'#s1',
-            name:'name',
-            url:'/index.php/home/exception/getRealNames'
-        });
-        suggest.render();
-        $("[name='name']").val("{$entity.real_name}");
-        var items = [
-            {text:'事假',value:'1'},
-            {text:'病假',value:'2'},
-            {text:'调休',value:'3'},
-            {text:'外出',value:'4'}
-        ],
-        select = new Select.Select({
-            render:'#type',
-            valueField:'#hide',
-            items:items
-        });
-        select.render();
-        select.setSelectedValue("{$entity.type}");
     });
 </script>
 <!-- script end -->

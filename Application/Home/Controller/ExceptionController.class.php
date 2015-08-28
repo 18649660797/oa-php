@@ -9,6 +9,7 @@
 namespace Home\Controller;
 
 
+use Home\Service\EmployeeServiceImpl;
 use Home\Utils\RenderUtil;
 
 class ExceptionController extends BasicController
@@ -30,9 +31,8 @@ class ExceptionController extends BasicController
 
     public function getRealNames($name = "", $callback)
     {
-        header("Content-type: application/json");
-        $result = M("Employee")->where(array("real_name" => array("like", "%$name%")))->getField("real_name", true);
-        echo $callback . "(" . json_encode($result) . ")";
+        $service = new EmployeeServiceImpl();
+        $service->suggestRealNames($name, $callback);
     }
 
     public function data()
@@ -74,7 +74,8 @@ class ExceptionController extends BasicController
         $this->display(T("exception/import"));
     }
 
-    public function import() {
+    public function import()
+    {
 
         redirect("viewList");
     }
