@@ -104,4 +104,266 @@ class AttendanceServiceImpl implements AttendanceService
         }
     }
 
+    function getAttendanceGroupByMonth($month)
+    {
+        $attendanceDao = D("Attendance");
+        $condition = array();
+        $condition["work_date"] = array(array("like", "$month%"));
+        // 当月所有考勤记录
+        $curMonthAttendances = $attendanceDao->relation(true)->where($condition)->select();
+        // 员工分组
+        $attendanceGroup = array();
+        // 分组数据
+        foreach ($curMonthAttendances as $attendance) {
+            if ($attendanceGroup[$attendance["e_id"]]) {
+                $attendanceGroup[$attendance["e_id"]][] = $attendance;
+            } else {
+                $attendanceGroup[$attendance["e_id"]] = array($attendance);
+            }
+        }
+        return $attendanceGroup;
+    }
+
+    function getExceptionGroupByMonth($month)
+    {
+        $exceptionDao = D("Exception");
+        $condition = array();
+        $condition["start_time"] = array(array("like", "$month%"));
+        $exceptionList = $exceptionDao->relation(true)->where($condition)->select();
+        // 异常分组
+        $exceptionGroup = array();
+        // 分组数据
+        foreach ($exceptionList as $exception) {
+            if ($exceptionGroup[$exception["e_id"]]) {
+                $exceptionGroup[$exception["e_id"]][] = $exception;
+            } else {
+                $exceptionGroup[$exception["e_id"]] = array($exception);
+            }
+        }
+        return $exceptionGroup;
+    }
+
+    function analysisAttendanceByMonth($attendanceGroup, $exceptionGroup)
+    {
+        import("Org.Util.PHPExcel");
+        $objPHPExcel = new \PHPExcel();
+        $property = $objPHPExcel->getProperties();
+        $property->setCreator(session("S_UNAME"));
+        $property->setLastModifiedBy(session("S_UNAME"));
+        $property->setTitle("Office 2007 XLSX Test Document");
+        $property->setSubject("Office 2007 XLSX Test Document");
+        $property->setDescription("考勤");
+        // 选择工作簿
+        $objPHPExcel->setActiveSheetIndex(0);
+        // 工作簿
+        $selectSheet = $objPHPExcel->getActiveSheet();
+        // 设置自适应列
+        $selectSheet->getColumnDimension('D')->setWidth(10);
+        $selectSheet->getColumnDimension('J')->setAutoSize(true);
+        $selectSheet->getColumnDimension('K')->setWidth(20);
+        $selectSheet->getColumnDimension('L')->setWidth(20);
+        // 合并单元格
+        $selectSheet->mergeCells('A1:J1');
+        // 填充表头
+        $selectSheet->SetCellValue('A1', '说明：蓝色填充为3次9:15前迟到机会，绿色填充为外出、加班晚到等未计考勤情况，黄色填充为违反制度情况。 ');
+        $selectSheet->SetCellValue('A2', '部门');
+        $selectSheet->SetCellValue('B2', '姓名');
+        $selectSheet->SetCellValue('C2', '周期');
+        $selectSheet->SetCellValue('D2', '日期');
+        $selectSheet->SetCellValue('E2', '上班');
+        $selectSheet->SetCellValue('F2', '下班');
+        $selectSheet->SetCellValue('G2', '事假');
+        $selectSheet->SetCellValue('H2', '病假');
+        $selectSheet->SetCellValue('I2', '调休');
+        $selectSheet->SetCellValue('J2', '备注');
+        $selectSheet->SetCellValue('K2', '迟到');
+        $selectSheet->SetCellValue('L2', '早退');
+        $selectSheet->SetCellValue('M2', '旷工');
+        // 从第三行开始填充数据
+        $rows = 3;
+        // 个人每月15分钟内迟到限制次数
+        $delayTimesLimit = 3;
+        // 个人每月早退限制次数
+        $overlayTimesLimit = 4;
+        // 需要打卡的时间
+        $amNeedFit = "09:00";
+        $amNeedFitTime = strtotime($amNeedFit);
+        $pmNeedFit = "18:00";
+        $pmNeedFitTime = strtotime($pmNeedFit);
+        // 遍历每个人
+        foreach ($attendanceGroup as $attendanceList) {
+            // 个人每月15分钟内迟到次数
+            $delayTimes = 0;
+            // 个人每月早退次数
+            $overlayTimes = 0;
+            // 个人乐捐金额
+            $applyMoneyAm = 0;
+            $applyMoneyPm = 0;
+            // 遍历每天
+            for ($i = 0; $i < count($attendanceList); $i++) {
+                $remarkTmp = "";
+                // 考勤记录
+                $attendance = $attendanceList[$i];
+                // 前一天记录
+                $previous = $attendanceList[$i - 1];
+                // 考勤日
+                $workDate = $attendance["work_date"];
+                // 上午打卡
+                $amTime = $attendance["am_time"];
+                // 下午打卡
+                $pmTime = $attendance["pm_time"];
+                // 考勤状态 0：不需要考勤 1:需要考勤
+                $status = $attendance["status"];
+                // 员工id
+                $eId = $attendance["e_id"];
+                // 备注
+                $remark = $attendance["remark"];
+                // 清除掉上午和下午打卡时间一致的情况
+                if ($amTime == $pmTime) {
+                    if (strtotime($amTime) > strtotime("12:00")) {
+                        $amTime = null;
+                    } else {
+                        $pmTime = null;
+                    }
+                }
+                if (strtotime("12:00") - strtotime($pmTime) > 0) {
+                    $pmTime = null;
+                }
+                $selectSheet->SetCellValue("A$rows", $attendance["department"]);
+                $selectSheet->SetCellValue("B$rows", $attendance["real_name"]);
+                $selectSheet->SetCellValue("C$rows", DateUtils::getWeek($workDate));
+                $selectSheet->SetCellValue("D$rows", $workDate);
+                $selectSheet->SetCellValue("E$rows", $amTime);
+                $selectSheet->SetCellValue("F$rows", $pmTime);
+                $selectSheet->SetCellValue("J$rows", $remark);
+                if ($status == 0) { // 不需要考勤
+                    $selectSheet->getStyle("C$rows")->getFont()->getColor()->setARGB(\PHPExcel_Style_Color::COLOR_BLUE);
+                } else {
+                    $continue = true;
+                    $amNeedFit_ = $amNeedFit;
+                    $pmNeedFit_ = $pmNeedFit;
+                    // 如果此人当月有异常情况
+                    $exceptionList = $exceptionGroup[$eId];
+                    if ($exceptionList) {
+                        foreach ($exceptionList as $exception) {
+                            $beginTime = $exception["begin_time"];
+                            $endTime = $exception["end_time"];
+                            $pos1 = strpos($beginTime, $workDate);
+                            $pos2 = strpos($endTime, $workDate);
+                            if ((is_numeric($pos1) && $pos1 > -1) || (is_numeric($pos2) && $pos2 > -1)) {
+                                $tmpEnd = substr($endTime, 11, 5);
+                                $tmpEndTime = strtotime($tmpEnd);
+                                $tmpBegin = substr($beginTime, 11, 5);
+                                $tmpBeginTime = strtotime($tmpBegin);
+                                $delayTimes = ($tmpEndTime - $tmpBeginTime)/3600.0;
+                                if ($tmpBeginTime < strtotime("12:00") && $tmpEndTime > strtotime("12:00")) {
+                                    $delayTimes -= 1.5;
+                                }
+                                if ($delayTimes >= 7.5) {
+                                    $continue = false;
+                                } else if ($tmpBeginTime > $amNeedFitTime && $tmpEndTime < $pmNeedFitTime){
+                                    // 如果处于中间的话，不处理
+                                } else if ($tmpBeginTime == $amNeedFitTime && $tmpEndTime < $pmNeedFitTime) {
+                                    $amNeedFit_ = $tmpEnd;
+                                } else if ($tmpEndTime == $pmNeedFitTime && $tmpBeginTime > $amNeedFitTime) {
+                                    $pmNeedFit_ = $tmpBegin;
+                                }
+                                switch ($exception["type"]) {
+                                    case 1:
+                                        $selectSheet->SetCellValue("G$rows", "$delayTimes" . "h");
+                                        break;
+                                    case 2:
+                                        $selectSheet->SetCellValue("H$rows", "$delayTimes" . "h");
+                                        break;
+                                    case 3:
+                                        $selectSheet->SetCellValue("I$rows", "$delayTimes" . "h");
+                                        break;
+                                    case 4:
+                                        $selectSheet->SetCellValue("J$rows", "$delayTimes" . "h");
+                                        break;
+                                }
+                                if (!$remark && $exception["type"] != 4) {
+                                    $remarkTmp .= $exception["remark"] . ";";
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    if ($continue) {
+                        // 如果上午和下午都没有打卡记录的话，记为矿工
+                        if (!$amTime && !$pmTime) {
+                            $selectSheet->SetCellValue("M$rows", "7.5h");
+                        } else {
+                            if (!$amTime || strtotime($amTime) > strtotime($amNeedFit_)) { // 迟到
+                                $delay = 0;
+                                if (!$amTime) {
+                                    $delay = (strtotime($pmTime) - strtotime($amNeedFit_))/60 - 90;
+                                } else {
+                                    $delay = (strtotime($amTime) - strtotime($amNeedFit_)) / 60;
+                                }
+                                $color = "";
+                                // 如果迟到在一个小时内，并且前天加班到九点半后
+                                if ($previous && $delay < 60 && strtotime($previous["pm_time"]) > strtotime("21:30")) {
+                                    $color = "FF9AFF9A";
+                                } else if ($delay <= 15) { // 如果迟到在十五分钟内
+                                    // 如果迟到次数还没到
+                                    if ($delayTimes++ < $delayTimesLimit) {
+                                        $color = "FF00F5FF";
+                                    } else {
+                                        $applyMoneyAm += 10;
+                                        $remarkTmp .= "迟到乐捐$applyMoneyAm 元;";
+                                        $color = "FFFFFF00";
+                                    }
+                                } else {
+                                    $color = "FFFFFF00";
+                                    if ($delay <= 30) {
+                                        $applyMoneyAm += 10;
+                                        $remarkTmp .= "迟到乐捐$applyMoneyAm 元;";
+                                        $color = "FFFFFF00";
+                                    } else if ($delay > 30 && $delay <= 60) {
+                                        $remarkTmp .= "迟到扣除1h工资";
+                                    } else if ($delay > 60 && $delay <= 180) {
+                                        $remarkTmp .= "迟到扣除3h工资;";
+                                    } else if ($delay > 180) {
+                                        $remarkTmp .= "迟到扣除1天工资;";
+                                    }
+                                }
+                                $selectSheet->SetCellValue("K$rows", "迟到 $delay 分钟");
+                                $selectSheet->getStyle("E$rows")->getFill()->setFillType(\PHPExcel_Style_Fill::FILL_SOLID);
+                                $selectSheet->getStyle("E$rows")->getFill()->getStartColor()->setARGB($color);
+                                $selectSheet->getStyle("E$rows")->getBorders()->getAllBorders()->setBorderStyle(\PHPExcel_Style_Border::BORDER_THIN);
+                                $selectSheet->getStyle("E$rows")->getBorders()->getAllBorders()->getColor()->setARGB("FF000000");
+                            }
+                            if (!$pmTime || strtotime($pmTime) < strtotime($pmNeedFit_)) { // 早退
+                                $selectSheet->getStyle("F$rows")->getFill()->setFillType(\PHPExcel_Style_Fill::FILL_SOLID);
+                                $selectSheet->getStyle("F$rows")->getFill()->getStartColor()->setARGB('FFFFFF00');
+                                $selectSheet->getStyle("F$rows")->getBorders()->getAllBorders()->setBorderStyle(\PHPExcel_Style_Border::BORDER_THIN);
+                                $selectSheet->getStyle("F$rows")->getBorders()->getAllBorders()->getColor()->setARGB("FF000000");
+                                if ($pmTime) {
+                                    $overlay = (strtotime($pmNeedFit_) - strtotime($pmTime)) / 60;
+                                    $selectSheet->SetCellValue("L$rows", "早退 $overlay 分钟");
+                                }
+                                if ($overlayTimes++ < $overlayTimesLimit) {
+                                    $remarkTmp .= "早退补卡;";
+                                } else {
+                                    $applyMoneyPm += 10;
+                                    $remarkTmp .= "迟到乐捐$applyMoneyPm 元;";
+                                }
+                            }
+                        }
+                    }
+                    if ($remarkTmp) {
+                        $selectSheet->SetCellValue("J$rows", $remarkTmp);
+                    }
+                }
+                $rows++;
+            }
+            $rows++;
+        }
+        // Rename sheet
+        $selectSheet->setTitle('sheet1');
+        return $objPHPExcel;
+    }
+
+
 }

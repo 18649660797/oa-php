@@ -8,22 +8,22 @@
 <body>
     <div class="row">
         <form id="J_FORM" class="form-panel" action="data" method="post" style="margin-bottom:0;">
-            <input type="hidden" name="join" value="edy_employee on edy_employee.id = edy_attendance.e_id"/>
-            <input type="hidden" name="eq_status" value="1"/>
+            <input type="hidden" name="join" value="edy_employee e on e.id = a.e_id"/>
+            <input type="hidden" name="eq_a:status" value="1"/>
             <div class="panel-title">
             <span>
                 <label>考勤月：</label>
-                <input type="text" id="J_Month" name="like_work_date" value="">
+                <input type="text" id="J_Month" name="like_a:work_date" value="">
 
-                <label>打卡日期：</label><input name="between_work_date" type="text" class="calendar" /> <label>至</label> <input name="between_work_date" type="text" class="calendar" />
+                <label>打卡日期：</label><input name="between_a:work_date" type="text" class="calendar" /> <label>至</label> <input name="between_a:work_date" type="text" class="calendar" />
 
                 <label>姓名：</label>
-                <input type="text" class="control-text" name="like_real_name" value="" />
+                <input type="text" class="control-text" name="like_e:real_name" value="" />
 
                 <label>部门：</label>
-                <select name="eq_department">
+                <select name="eq_e:department">
                     <option value="">全部</option>
-                    <option value="产品部">产品部</option>
+                    <option value="产品中心">产品中心</option>
                     <option value="开发部">开发部</option>
                     <option value="运营部">运营部</option>
                     <option value="销售部">销售部</option>
@@ -36,9 +36,9 @@
             </div>
             <ul class="panel-content">
                 <li>
-                    <label class="control-text">迟到：</label><input style="width:20px;" type="checkbox" name="gt_am_time" value="09:00" />
-                    <label class="control-text">早退：</label><input style="width:20px;" type="checkbox" name="lt_pm_time" value="18:00" />
-                    <label class="control-text">迟到15分钟内：</label><input style="width:20px;" type="checkbox" name="between_am_time" value="09:00,09:15" />
+                    <label class="control-text">迟到：</label><input style="width:20px;" type="checkbox" name="gt_a:am_time" value="09:00" />
+                    <label class="control-text">早退：</label><input style="width:20px;" type="checkbox" name="lt_a:pm_time" value="18:00" />
+                    <label class="control-text">迟到15分钟内：</label><input style="width:20px;" type="checkbox" name="between_a:am_time" value="09:00,09:15" />
                     <button type="submit" class="button button-primary">查询>></button>
                 </li>
             </ul>

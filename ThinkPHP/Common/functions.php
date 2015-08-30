@@ -1552,6 +1552,7 @@ function in_array_case($value,$array){
 function query($model, $relationQuery = false) {
     $data = D($model);
     if (I("join")) {
+        $data ->alias("a");
         $data -> join(I("join"));
     }
     if ($relationQuery) {
@@ -1568,6 +1569,7 @@ function query($model, $relationQuery = false) {
 function getCount($model, $relationQuery = false) {
     $data = D($model);
     if (I("join")) {
+        $data ->alias("a");
         $data -> join(I("join"));
     }
     if ($relationQuery) {
@@ -1584,6 +1586,7 @@ function condition() {
     $condition = array();
     foreach($_REQUEST as $key=>$value){
         if (strpos($key, "_") > -1) {
+            $key = str_replace(":", ".", $key);
             $arr = explode("_", $key, 2);
             if (count($arr) == 2) {
                 switch ($arr[0]) {

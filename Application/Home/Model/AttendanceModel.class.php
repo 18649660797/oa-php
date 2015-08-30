@@ -15,12 +15,13 @@ class AttendanceModel extends RelationModel
             'mapping_type'      => self::BELONGS_TO,
             'class_name'        => 'Employee',
             'foreign_key'   => 'e_id',
-            'relation_foreign_key' => 'e_id',
+//            'relation_foreign_key' => 'e_id',
 //            'mapping_name'  => 'employee'
             // 定义更多的关联属性
             'as_fields' => 'real_name,department,attendance_cn',
             )
         );
+
     var $work_date;
     var $am_time;
     var $pm_time;
