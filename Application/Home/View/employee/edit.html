@@ -44,7 +44,7 @@
             callback : function(data){
                 if (edy.ajaxHelp.handleAjax((data))) {
                     BUI.Message.Alert(data.message || "操作成功");
-                    location.href = "/index.php/home/employee/list";
+                    location.href = "/index.php/home/employee/viewList";
                 }
             }
         }).render();
