@@ -102,7 +102,7 @@ class EmployeeController extends BasicController
                 $attendance -> add($data);
             }
         }
-        redirect("/index.php/home/employee/list");
+        redirect("viewList");
     }
 
     function encode($str) {
