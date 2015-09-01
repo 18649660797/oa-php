@@ -186,7 +186,7 @@ class AttendanceServiceImpl implements AttendanceService
         // 个人每月早退限制次数
         $overlayTimesLimit = 4;
         // 需要打卡的时间
-        $amNeedFit = "09:00";
+        $amNeedFit = "09:03";
         $amNeedFitTime = strtotime($amNeedFit);
         $pmNeedFit = "18:00";
         $pmNeedFitTime = strtotime($pmNeedFit);
@@ -241,6 +241,9 @@ class AttendanceServiceImpl implements AttendanceService
                 } else {
                     $continue = true;
                     $amNeedFit_ = $amNeedFit;
+                    if (strtotime($workDate) >= strtotime("2015-08-21")) {
+                        $amNeedFit_ = "09:08";
+                    }
                     $pmNeedFit_ = $pmNeedFit;
                     // 如果此人当月有异常情况
                     $exceptionList = $exceptionGroup[$eId];
@@ -263,9 +266,9 @@ class AttendanceServiceImpl implements AttendanceService
                                     $continue = false;
                                 } else if ($tmpBeginTime > $amNeedFitTime && $tmpEndTime < $pmNeedFitTime){
                                     // 如果处于中间的话，不处理
-                                } else if ($tmpBeginTime == $amNeedFitTime && $tmpEndTime < $pmNeedFitTime) {
+                                } else if ($tmpBeginTime == strtotime("09:00") && $tmpEndTime < strtotime("18:00")) {
                                     $amNeedFit_ = $tmpEnd;
-                                } else if ($tmpEndTime == $pmNeedFitTime && $tmpBeginTime > $amNeedFitTime) {
+                                } else if ($tmpEndTime == strtotime("09:00") && $tmpBeginTime > $amNeedFitTime) {
                                     $pmNeedFit_ = $tmpBegin;
                                 }
                                 switch ($exception["type"]) {
@@ -279,10 +282,10 @@ class AttendanceServiceImpl implements AttendanceService
                                         $selectSheet->SetCellValue("I$rows", "$delayTimes" . "h");
                                         break;
                                     case 4:
-                                        $selectSheet->SetCellValue("J$rows", "$delayTimes" . "h");
+                                        $selectSheet->SetCellValue("J$rows", "外出$delayTimes" . "h");
                                         break;
                                 }
-                                if (!$remark && $exception["type"] != 4) {
+                                if (!$remark && $exception["type"] != 4 && $exception["remark"]) {
                                     $remarkTmp .= $exception["remark"] . ";";
                                 }
                                 break;
@@ -321,7 +324,7 @@ class AttendanceServiceImpl implements AttendanceService
                                         $remarkTmp .= "迟到乐捐$applyMoneyAm 元;";
                                         $color = "FFFFFF00";
                                     } else if ($delay > 30 && $delay <= 60) {
-                                        $remarkTmp .= "迟到扣除1h工资";
+                                        $remarkTmp .= "迟到扣除1h工资;";
                                     } else if ($delay > 60 && $delay <= 180) {
                                         $remarkTmp .= "迟到扣除3h工资;";
                                     } else if ($delay > 180) {

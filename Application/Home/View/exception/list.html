@@ -6,6 +6,35 @@
     <?php include_once $_SERVER["DOCUMENT_ROOT"] . "/Public/include/resources.php"; ?>
 </head>
 <body>
+<div class="row">
+    <form id="J_FORM" class="form-panel" action="data" method="post" style="margin-bottom:0;">
+        <input type="hidden" name="join" value="edy_employee e on e.id = a.e_id"/>
+        <div class="panel-title">
+            <span>
+                <label>姓名：</label>
+                <input type="text" class="control-text" name="like_e:real_name" value="" />
+
+                <label>假别：</label>
+                <select name="eq_a:type">
+                    <option value="">全部</option>
+                    <option value="1">事假</option>
+                    <option value="2">病假</option>
+                    <option value="3">调休</option>
+                    <option value="4">外出</option>
+                    <option value="5">丧假</option>
+                    <option value="6">年假</option>
+                    <option value="7">婚假</option>
+                    <option value="8">产假</option>
+                </select>
+            </span>
+        </div>
+        <ul class="panel-content">
+            <li>
+                <button type="submit" class="button button-primary">查询>></button>
+            </li>
+        </ul>
+    </form>
+</div>
 <div id="grid"></div>
 <script>
     (function($) {
@@ -20,7 +49,7 @@
                     {title: 'id', dataIndex: 'id', width: 60},
                     {title: '姓名', dataIndex: 'real_name', width: 60},
                     {title: '类型', dataIndex: 'type', width: 60, renderer: function(val, row) {
-                        return {1:"事假", 2: "病假", 3: "调休", 4: "外出"}[val];
+                        return {1: "事假", 2: "病假", 3: "调休", 4: "外出", 5: "丧假", 6: "年假", 7: "婚假", 8: "产假"}[val];
                     }},
                     {title: '开始日期', dataIndex: 'begin_time', width: 150},
                     {title: '结束时间', dataIndex: 'end_time', width: 150},

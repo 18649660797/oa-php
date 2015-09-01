@@ -32,19 +32,214 @@ class AttendanceController extends BasicController
         $objPHPExcel->getProperties()->setTitle("Office 2007 XLSX Test Document");
         $objPHPExcel->getProperties()->setSubject("Office 2007 XLSX Test Document");
         $objPHPExcel->getProperties()->setDescription("Test document for Office 2007 XLSX, generated using PHP classes.");
-        // Add some data
         $objPHPExcel->setActiveSheetIndex(0);
-        $objPHPExcel->getActiveSheet()->SetCellValue('A1', '林嘉斌');
-        $objPHPExcel->getActiveSheet()->SetCellValue('B1', '调休');
-        $objPHPExcel->getActiveSheet()->SetCellValue('C1', '2015-08-10 09:00:00');
-        $objPHPExcel->getActiveSheet()->SetCellValue('D1', '2015-08-10 18:00:00');
-        $objPHPExcel->getActiveSheet()->SetCellValue('A2', '林嘉斌');
-        $objPHPExcel->getActiveSheet()->SetCellValue('B2', '请假');
-        $objPHPExcel->getActiveSheet()->SetCellValue('C2', '2015-08-11 13:30:00');
-        $objPHPExcel->getActiveSheet()->SetCellValue('D2', '2015-08-11 18:00:00');
+
+        $employeeList = M("Employee")->select();
+        $employeeMap = array();
+        foreach ($employeeList as $one) {
+            $employeeMap[$one["attendance_cn"]] = $one["real_name"];
+        }
+        $exceptionJsonMap = array(1 => "事假", 2 => "病假", 3 => "调休", 4 => "外出", 5=>"丧假", 6=> "年假", 7=>"产假",8=>"婚假");
+        $exceptionGroup = array(
+            "产品部"=>array(
+                "A19"=>array(
+                    array(1, "08-17", "09:00", "18:00"),
+                    array(1, "08-18", "11:00", "18:00"),
+                    array(5, "08-04", "09:00", "18:00"),
+                    array(5, "08-05", "09:00", "18:00")
+                ),
+                "A28"=>array(
+                    array(1, "08-11", "09:00", "12:00"),
+                    array(1, "08-17", "09:00", "12:00"),
+                    array(1, "08-12", "09:00", "11:00")
+                ),
+                "A55"=>array(
+                    array(1, "08-04", "09:00", "18:00"),
+                    array(1, "08-05", "09:00", "18:00"),
+                    array(1, "08-06", "09:00", "18:00"),
+                    array(1, "08-22", "17:00", "18:00")
+                ),
+                "A60"=>array(
+                    array(1, "08-17", "09:00", "12:00"),
+                    array(1, "08-05", "13:30", "18:00")
+                ),
+                "A31"=>array(
+                    array(3, "08-10", "09:00", "18:00")
+                ),
+                "A71"=>array(
+                    array(1, "08-19", "13:30", "18:00")
+                ),
+                "A61"=>array(
+                    array(1, "08-20", "09:00", "10:00")
+                ),
+                "A45"=>array(
+                    array(1, "08-07", "13:30", "18:00")
+                ),
+                "A4"=>array(
+                    array(3, "08-17", "09:00", "12:00")
+                ),
+                "A20"=>array(
+                    array(3, "08-19", "09:00", "18:00"),
+                    array(3, "08-20", "09:00", "18:00")
+                ),
+                "A43"=>array(
+                    array(1, "08-09", "09:00", "18:00")
+                )
+            ),
+            "研发部"=>array(
+                "A53"=>array(
+                    array(3, "08-28", "09:00", "10:00"),
+                    array(3, "08-24", "09:00", "18:00"),
+                    array(3, "08-10", "09:00", "18:00")
+                ),
+                "A33"=>array(
+                    array(2, "08-21", "09:00", "18:00"),
+                    array(3, "08-14", "09:00", "18:00"),
+                    array(3, "08-10", "09:00", "18:00")
+                ),
+                "A6"=>array(
+                    array(3, "08-29", "09:00", "18:00"),
+                    array(3, "08-19", "09:00", "12:00"),
+                    array(3, "08-08", "09:00", "18:00")
+                ),
+                "A27"=>array(
+                    array(3, "08-08", "09:00", "18:00")
+                ),
+                "A7"=>array(
+                    array(3, "08-27", "09:00", "09:30"),
+                    array(3, "08-11", "09:00", "18:00")
+                ),
+                "A40"=>array(
+                    array(3, "08-29", "09:00", "18:00"),
+                    array(1, "08-09", "09:00", "18:00")
+                ),
+                "A49"=>array(
+                    array(3, "08-22", "09:00", "18:00"),
+                    array(3, "08-08", "09:00", "18:00")
+                ),
+                "A10"=>array(
+                    array(3, "08-10", "09:00", "09:30"),
+                    array(3, "08-14", "09:00", "09:30"),
+                    array(3, "08-19", "09:00", "09:30"),
+                    array(3, "08-21", "09:00", "09:30"),
+                    array(3, "08-24", "09:00", "09:30"),
+                    array(3, "08-18", "09:00", "10:00"),
+                    array(3, "08-26", "09:00", "14:00")
+                ),
+                "A47"=>array(
+                    array(3, "08-31", "09:00", "18:00"),
+                    array(3, "08-20", "10:00", "15:00"),
+                    array(3, "08-20", "10:00", "15:00")
+                ),
+                "A46"=>array(
+                    array(3, "08-29", "10:00", "18:00"),
+                    array(3, "08-08", "09:00", "18:00")
+                ),
+                "A62"=>array(
+                    array(3, "08-12", "09:00", "12:00"),
+                    array(3, "08-29", "13:30", "18:00")
+                )
+            ),
+            "行政部"=>array(
+                "A15"=>array(
+                    array(1, "08-21", "09:00", "10:30"),
+                    array(1, "08-12", "09:00", "18:00")
+                )
+            ),
+            "运营"=>array(
+                "A48"=>array(
+                    array(1, "08-14", "13:30", "18:00"),
+                    array(1, "08-28", "17:00", "18:00"),
+                    array(1, "08-29", "09:00", "18:00")
+                ),
+                "A58"=>array(
+                    array(1, "08-06", "16:00", "18:00"),
+                    array(1, "08-03", "09:00", "18:00")
+                ),
+                "A35"=>array(
+                    array(1, "08-27", "13:30", "18:00"),
+                    array(1, "08-26", "09:00", "18:00"),
+                    array(1, "08-08", "09:00", "18:00")
+                )
+            ),
+            "市场"=>array(
+                "A36"=>array(
+                    array(1, "08-20", "15:00", "18:00"),
+                    array(1, "08-21", "09:00", "12:00"),
+                    array(1, "08-27", "09:00", "18:00"),
+                    array(1, "08-28", "09:00", "12:00")
+                ),
+                "A52"=>array(
+                    array(1, "08-08", "09:00", "18:00"),
+                    array(1, "08-09", "09:00", "15:30"),
+                    array(3, "08-05", "09:00", "18:00"),
+                    array(1, "08-04", "13:30", "18:00"),
+                    array(1, "08-03", "13:30", "18:00")
+                ),
+                "A54"=>array(
+                    array(1, "08-24", "09:00", "15:30"),
+                    array(1, "08-18", "09:00", "14:30"),
+                    array(3, "08-17", "09:00", "18:00")
+                ),
+                "A13"=>array(
+                    array(1, "08-22", "09:00", "18:00"),
+                    array(1, "08-03", "09:00", "18:00"),
+                    array(3, "08-04", "14:00", "18:00")
+                ),
+                "A26"=>array(
+                    array(2, "08-27", "09:00", "18:00"),
+                    array(1, "08-22", "15:00", "18:00")
+                ),
+                "A14"=>array(
+                    array(1, "08-22", "09:00", "18:00"),
+                ),
+                "A34"=>array(
+                    array(1, "08-25", "09:00", "18:00")
+                ),
+                "A11"=>array(
+                    array(2, "08-17", "09:00", "11:00")
+                ),
+                "A12"=>array(
+                    array(6, "08-19", "09:00", "18:00")
+                )
+            ),
+            "销售"=>array(
+                "A21"=>array(
+                    array(2, "08-11", "09:00", "18:00"),
+                    array(2, "08-17", "09:00", "18:00")
+                ),
+                "A66"=>array(
+                    array(1, "08-14", "15:00", "18:00"),
+                    array(1, "08-17", "09:00", "18:00")
+                ),
+                "A65"=>array(
+                    array(1, "08-29", "13:30", "18:00")
+                ),
+                "A41"=>array(
+                    array(1, "08-28", "09:00", "18:00"),
+                    array(1, "08-29", "09:00", "18:00")
+                ),
+                "A30"=>array(
+                    array(1, "08-25", "09:00", "12:00")
+                ),
+            )
+        );
+        $rows = 1;
+        foreach ($exceptionGroup as $exceptionJson) {
+            foreach ($exceptionJson as $key => $exceptionJson2) {
+                foreach ($exceptionJson2 as $one) {
+                    $objPHPExcel->getActiveSheet()->SetCellValue("A$rows", $employeeMap[$key]);
+                    $objPHPExcel->getActiveSheet()->SetCellValue("B$rows", $exceptionJsonMap[$one[0]]);
+                    $objPHPExcel->getActiveSheet()->SetCellValue("C$rows", "2015-" . $one[1] . " " . $one[2] . ":00");
+                    $objPHPExcel->getActiveSheet()->SetCellValue("D$rows", "2015-" . $one[1] . " " . $one[3] . ":00");
+                    $objPHPExcel->getActiveSheet()->SetCellValue("E$rows", $one[4]);
+                    $rows++;
+                }
+            }
+        }
         // Rename sheet
         $objPHPExcel->getActiveSheet()->setTitle('Simple');
-        ExcelUtils::excel($objPHPExcel);
+        ExcelUtils::excel($objPHPExcel, "请假登记");
     }
 
     public function data()

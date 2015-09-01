@@ -100,9 +100,9 @@ class ExceptionController extends BasicController
         foreach ($employeeList as $employee) {
             $employeeMap[$employee["real_name"]] = $employee["id"];
         }
-        $exceptionMap = array("事假" => 1, "病假" => 2, "调休" => 3, "外出" => 4);
+        $exceptionMap = array("事假" => 1, "病假" => 2, "调休" => 3, "外出" => 4, "丧假" => 5, "年假" => 6, "婚假" => 7, "产假" => 8);
         $dataList = array();
-        for ($currentRow = 1; $currentRow <= $allRow; $currentRow++) {
+        for ($currentRow = 2; $currentRow <= $allRow; $currentRow++) {
             $data = array();
             $realName = $currentSheet->getCell("A$currentRow")->getValue();
             $type = $currentSheet->getCell("B$currentRow")->getValue();
@@ -112,10 +112,13 @@ class ExceptionController extends BasicController
             $data["e_id"] = $employeeMap[$realName];
             $data["begin_time"] = $beginTime;
             $data["end_time"] = $endTime;
+//            $data["begin_time"] = "20" . \PHPExcel_Style_NumberFormat::toFormattedString($beginTime,  "Y-m-d H:i:s");
+//            $data["end_time"] = "20" . \PHPExcel_Style_NumberFormat::toFormattedString($endTime,  "Y-m-d H:i:s");
             $data["type"] = $exceptionMap[$type];
             $data["remark"] = $remark;
             $dataList[] = $data;
         }
+//        var_dump($dataList);
         M("Exception")->addAll($dataList);
         redirect("viewList");
     }

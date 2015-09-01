@@ -8,14 +8,18 @@ namespace Home\Utils;
  */
 class ExcelUtils
 {
-    static function excel($excel) {
+    static function excel($excel, $fileName)
+    {
+        if (!$fileName) {
+            $fileName = time();
+        }
         header('Content-Type: application/vnd.ms-excel');
-        header('Content-Disposition: attachment;filename="exception.xls"');
+        header('Content-Disposition: attachment;filename="' . $fileName . '.xls"');
         header('Cache-Control: max-age=0');
 //        $objWriter = \PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
 //        $objWriter->save('php://output');
         // Save Excel 2007 file
         $objWriter = new \PHPExcel_Writer_Excel2007($excel);
-        $objWriter -> save('php://output');
+        $objWriter->save('php://output');
     }
 }
