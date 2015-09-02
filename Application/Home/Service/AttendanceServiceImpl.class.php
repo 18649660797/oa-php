@@ -107,15 +107,16 @@ class AttendanceServiceImpl implements AttendanceService
     function getAttendanceGroupByMonth($month)
     {
         $attendanceDao = D("Attendance");
+        $attendanceDao->alias("a")->join("edy_employee e on e.id=a.e_id");
         $condition = array();
-        $condition["work_date"] = array(array("like", "$month%"));
+        $condition["a.work_date"] = array(array("like", "$month%"));
         // 当月所有考勤记录
-        $curMonthAttendances = $attendanceDao->relation(true)->where($condition)->select();
+        $curMonthAttendances = $attendanceDao->relation(true)->where($condition)->getField("a.id,a.e_id,a.work_date,a.am_time,a.pm_time,a.status,e.real_name,a.remark,e.department", true);
         // 员工分组
         $attendanceGroup = array();
         // 分组数据
         foreach ($curMonthAttendances as $attendance) {
-            if ($attendanceGroup[$attendance["e_id"]]) {
+            if (array_key_exists($attendance["e_id"], $attendanceGroup)) {
                 $attendanceGroup[$attendance["e_id"]][] = $attendance;
             } else {
                 $attendanceGroup[$attendance["e_id"]] = array($attendance);
@@ -127,14 +128,15 @@ class AttendanceServiceImpl implements AttendanceService
     function getExceptionGroupByMonth($month)
     {
         $exceptionDao = D("Exception");
+        $exceptionDao->alias("a")->join("edy_employee e on e.id=a.e_id");
         $condition = array();
-        $condition["start_time"] = array(array("like", "$month%"));
-        $exceptionList = $exceptionDao->relation(true)->where($condition)->select();
+        $condition["a.begin_time"] = array(array("like", "$month%"));
+        $exceptionList = $exceptionDao->where($condition)->getField("a.begin_time,a.end_time,a.e_id,a.type,a.remark");
         // 异常分组
         $exceptionGroup = array();
         // 分组数据
         foreach ($exceptionList as $exception) {
-            if ($exceptionGroup[$exception["e_id"]]) {
+            if (array_key_exists($exception["e_id"], $exceptionGroup)) {
                 $exceptionGroup[$exception["e_id"]][] = $exception;
             } else {
                 $exceptionGroup[$exception["e_id"]] = array($exception);
@@ -143,16 +145,24 @@ class AttendanceServiceImpl implements AttendanceService
         return $exceptionGroup;
     }
 
-    function analysisAttendanceByMonth($attendanceGroup, $exceptionGroup)
+    function newPhpExcel($creator, $operator, $desc)
     {
         import("Org.Util.PHPExcel");
         $objPHPExcel = new \PHPExcel();
         $property = $objPHPExcel->getProperties();
-        $property->setCreator(session("S_UNAME"));
-        $property->setLastModifiedBy(session("S_UNAME"));
+        $property->setCreator($creator);
+        $property->setLastModifiedBy($operator);
         $property->setTitle("Office 2007 XLSX Test Document");
         $property->setSubject("Office 2007 XLSX Test Document");
-        $property->setDescription("考勤");
+        $property->setDescription($desc);
+        return $objPHPExcel;
+    }
+
+    function analysisAttendanceByMonth($attendanceGroup, $exceptionGroup)
+    {
+        import("Org.Util.PHPExcel");
+        $admin = session("S_UNAME");
+        $objPHPExcel = $this->newPhpExcel($admin, $admin, "考勤分析");
         // 选择工作簿
         $objPHPExcel->setActiveSheetIndex(0);
         // 工作簿
@@ -205,7 +215,7 @@ class AttendanceServiceImpl implements AttendanceService
                 // 考勤记录
                 $attendance = $attendanceList[$i];
                 // 前一天记录
-                $previous = $attendanceList[$i - 1];
+                $previous = $i > 1 ? $attendanceList[$i - 1] : 0;
                 // 考勤日
                 $workDate = $attendance["work_date"];
                 // 上午打卡
@@ -246,7 +256,7 @@ class AttendanceServiceImpl implements AttendanceService
                     }
                     $pmNeedFit_ = $pmNeedFit;
                     // 如果此人当月有异常情况
-                    $exceptionList = $exceptionGroup[$eId];
+                    $exceptionList = array_key_exists($eId, $exceptionGroup) ? $exceptionGroup[$eId] : null;
                     if ($exceptionList) {
                         foreach ($exceptionList as $exception) {
                             $beginTime = $exception["begin_time"];
@@ -258,13 +268,13 @@ class AttendanceServiceImpl implements AttendanceService
                                 $tmpEndTime = strtotime($tmpEnd);
                                 $tmpBegin = substr($beginTime, 11, 5);
                                 $tmpBeginTime = strtotime($tmpBegin);
-                                $delayTime = ($tmpEndTime - $tmpBeginTime)/3600.0;
+                                $delayTime = ($tmpEndTime - $tmpBeginTime) / 3600.0;
                                 if ($tmpBeginTime < strtotime("12:00") && $tmpEndTime > strtotime("12:00")) {
                                     $delayTime -= 1.5;
                                 }
                                 if ($delayTime >= 7.5) {
                                     $continue = false;
-                                } else if ($tmpBeginTime > $amNeedFitTime && $tmpEndTime < $pmNeedFitTime){
+                                } else if ($tmpBeginTime > $amNeedFitTime && $tmpEndTime < $pmNeedFitTime) {
                                     // 如果处于中间的话，不处理
                                 } else if ($tmpBeginTime == strtotime("09:00") && $tmpEndTime <= strtotime("18:00")) {
                                     if ($tmpEnd == "12:00") {
@@ -322,7 +332,7 @@ class AttendanceServiceImpl implements AttendanceService
                                     $delay = (strtotime($amTime) - strtotime($amNeedFit_)) / 60;
                                 }
                                 if ($eId == "424") {
-                                    $a =1;
+                                    $a = 1;
                                 }
                                 $color = "";
                                 // 如果迟到在一个小时内，并且前天加班到九点半后

@@ -13,6 +13,7 @@ use Home\Utils\DateUtils;
 use Home\Utils\ExcelUtils;
 use Home\Utils\RenderUtil;
 use Home\Utils\StringUtils;
+use Think\Log;
 
 class AttendanceController extends BasicController
 {
@@ -387,8 +388,13 @@ class AttendanceController extends BasicController
             $exceptionGroup = $attendanceService->getExceptionGroupByMonth($month);
             // 分析导出excel
             $objPHPExcel = $attendanceService->analysisAttendanceByMonth($attendanceGroup, $exceptionGroup);
-            ExcelUtils::excel($objPHPExcel);
+            ExcelUtils::excel($objPHPExcel, "考勤分析数据");
         }
+    }
+
+    function log($msg) {
+        Log::record($msg,'WARN',true);
+        Log::write($msg, 'WARN');
     }
 
     public function test() {
