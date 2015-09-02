@@ -11,6 +11,7 @@ namespace Home\Controller;
 
 use Home\Service\EmployeeServiceImpl;
 use Home\Service\ExceptionServiceImpl;
+use Home\Utils\ExcelUtils;
 use Home\Utils\RenderUtil;
 
 class ExceptionController extends BasicController
@@ -38,7 +39,7 @@ class ExceptionController extends BasicController
 
     public function data()
     {
-        $result = query("Exception", true);
+        $result = query("Exception", true, "a.id,a.type,a.begin_time,a.end_time,a.remark,e.real_name,e.department");
         echo json_encode($result);
     }
 
@@ -110,7 +111,6 @@ class ExceptionController extends BasicController
             $employeeMap[$employee["real_name"]] = $employee["id"];
         }
         $exceptionMap = array("事假" => 1, "病假" => 2, "调休" => 3, "外出" => 4, "丧假" => 5, "年假" => 6, "婚假" => 7, "产假" => 8);
-        $dataList = array();
         $objPHPExcel = new \PHPExcel();
         $objPHPExcel->getProperties()->setCreator("Maarten Balliauw");
         $objPHPExcel->getProperties()->setLastModifiedBy("Maarten Balliauw");
@@ -120,17 +120,14 @@ class ExceptionController extends BasicController
         $objPHPExcel->setActiveSheetIndex(0);
         $rows = 1;
         // Rename sheet
-        $objPHPExcel->getActiveSheet()->setTitle('Simple');
-        ExcelUtils::excel($objPHPExcel, "请假登记");
         for ($currentRow = 2; $currentRow <= $allRow; $currentRow++) {
-            $data = array();
             $realName = $currentSheet->getCell("A$currentRow")->getValue();
             $type = $currentSheet->getCell("B$currentRow")->getValue();
             $beginTime = $currentSheet->getCell("C$currentRow")->getValue();
             $endTime = $currentSheet->getCell("D$currentRow")->getValue();
             $remark = $currentSheet->getCell("E$currentRow")->getValue();
             $objPHPExcel->getActiveSheet()->SetCellValue("A$rows", $realName);
-            $objPHPExcel->getActiveSheet()->SetCellValue("B$rows", $exceptionMap[$type]);
+            $objPHPExcel->getActiveSheet()->SetCellValue("B$rows", $type);
             $objPHPExcel->getActiveSheet()->SetCellValue("C$rows", $beginTime);
             $objPHPExcel->getActiveSheet()->SetCellValue("D$rows", $endTime);
             $objPHPExcel->getActiveSheet()->SetCellValue("E$rows", $remark);
@@ -159,10 +156,86 @@ class ExceptionController extends BasicController
                 array("08-13", "09:00", "18:00"),
                 array("08-14", "16:50", "18:00"),
                 array("08-18", "09:00", "15:00"),
-                array("08-19", "15:50", "18:00"),
-                array("08-27", "15:50", "18:00")
+                array("08-19", "09:00", "12:00"),
+                array("08-27", "09:00", "18:00")
+            ),
+            "陈艺鸣"=>array(
+                array("08-06", "09:00", "14:00"),
+                array("08-10", "09:00", "10:00"),
+                array("08-11", "10:15", "18:00"),
+                array("08-13", "14:00", "18:00"),
+                array("08-17", "09:00", "18:00"),
+                array("08-18", "09:00", "18:00"),
+                array("08-19", "09:00", "14:20"),
+                array("08-20", "09:00", "18:00"),
+                array("08-24", "14:50", "18:00"),
+                array("08-26", "09:00", "18:00"),
+                array("08-28", "09:00", "18:00"),
+                array("08-29", "09:00", "18:00"),
+                array("08-31", "09:00", "18:00")
+            ),
+            "谢秀萍"=>array(
+                array("08-12", "09:00", "18:00"),
+                array("08-18", "09:00", "18:00"),
+                array("08-19", "09:00", "10:30"),
+                array("08-22", "09:00", "18:00"),
+                array("08-26", "09:00", "10:00"),
+                array("08-31", "09:00", "18:00")
+            ),
+            "玄昌明"=>array(
+                array("08-03", "09:00", "18:00"),
+                array("08-04", "09:00", "18:00"),
+                array("08-05", "09:00", "18:00"),
+                array("08-06", "09:00", "18:00"),
+                array("08-11", "09:00", "18:00"),
+                array("08-12", "09:00", "18:00"),
+                array("08-13", "09:00", "18:00"),
+                array("08-14", "09:00", "18:00"),
+                array("08-18", "09:00", "18:00"),
+                array("08-19", "09:00", "18:00"),
+                array("08-20", "09:00", "18:00"),
+                array("08-21", "09:00", "18:00"),
+                array("08-22", "09:00", "18:00"),
+                array("08-25", "09:00", "18:00"),
+                array("08-26", "09:00", "18:00"),
+            ),
+            "余祚祥"=>array(
+                array("08-05", "09:00", "18:00"),
+                array("08-11", "14:00", "18:00"),
+                array("08-19", "15:30", "18:00"),
+                array("08-25", "09:40", "18:00"),
+                array("08-31", "09:00", "18:00"),
+            ),
+            "王清"=>array(
+                array("08-31", "13:30", "18:00")
+            ),
+            "俞世豪"=>array(
+                array("08-31", "14:00", "18:00")
+            ),
+            "陈倩媚"=>array(
+                array("08-26", "15:40", "18:00"),
+                array("08-28", "09:00", "18:00"),
+                array("08-29", "09:00", "18:00"),
+                array("08-30", "09:00", "18:00"),
+                array("08-31", "09:00", "18:00")
+            ),
+            "林伟南"=>array(
+                array("08-07", "09:00", "12:00"),
+                array("08-22", "09:00", "18:00"),
+                array("08-24", "09:00", "12:00")
             )
         );
+        foreach ($dataList as $key => $one) {
+            foreach ($one as $o) {
+                $objPHPExcel->getActiveSheet()->SetCellValue("A$rows", $key);
+                $objPHPExcel->getActiveSheet()->SetCellValue("B$rows", "外出");
+                $objPHPExcel->getActiveSheet()->SetCellValue("C$rows", "2015-" . $o[0] . " " . $o[1] . ":00");
+                $objPHPExcel->getActiveSheet()->SetCellValue("D$rows", "2015-" . $o[0] . " " . $o[2] . ":00");
+                $rows++;
+            }
+        }
+        $objPHPExcel->getActiveSheet()->setTitle('Simple');
+        ExcelUtils::excel($objPHPExcel, "外出登记");
     }
 
     public function viewAutoImport()

@@ -219,13 +219,13 @@ class AttendanceServiceImpl implements AttendanceService
                 // 备注
                 $remark = $attendance["remark"];
                 // 清除掉上午和下午打卡时间一致的情况
-                if ($amTime == $pmTime) {
-                    if (strtotime($amTime) > strtotime("12:00")) {
-                        $amTime = null;
-                    } else {
-                        $pmTime = null;
-                    }
-                }
+//                if ($amTime == $pmTime) {
+//                    if (strtotime($amTime) > strtotime("12:00")) {
+//                        $amTime = null;
+//                    } else {
+//                        $pmTime = null;
+//                    }
+//                }
                 if (strtotime("12:00") - strtotime($pmTime) > 0) {
                     $pmTime = null;
                 }
@@ -258,31 +258,48 @@ class AttendanceServiceImpl implements AttendanceService
                                 $tmpEndTime = strtotime($tmpEnd);
                                 $tmpBegin = substr($beginTime, 11, 5);
                                 $tmpBeginTime = strtotime($tmpBegin);
-                                $delayTimes = ($tmpEndTime - $tmpBeginTime)/3600.0;
+                                $delayTime = ($tmpEndTime - $tmpBeginTime)/3600.0;
                                 if ($tmpBeginTime < strtotime("12:00") && $tmpEndTime > strtotime("12:00")) {
-                                    $delayTimes -= 1.5;
+                                    $delayTime -= 1.5;
                                 }
-                                if ($delayTimes >= 7.5) {
+                                if ($delayTime >= 7.5) {
                                     $continue = false;
                                 } else if ($tmpBeginTime > $amNeedFitTime && $tmpEndTime < $pmNeedFitTime){
                                     // 如果处于中间的话，不处理
-                                } else if ($tmpBeginTime == strtotime("09:00") && $tmpEndTime < strtotime("18:00")) {
-                                    $amNeedFit_ = $tmpEnd;
-                                } else if ($tmpEndTime == strtotime("09:00") && $tmpBeginTime > $amNeedFitTime) {
-                                    $pmNeedFit_ = $tmpBegin;
+                                } else if ($tmpBeginTime == strtotime("09:00") && $tmpEndTime <= strtotime("18:00")) {
+                                    if ($tmpEnd == "12:00") {
+                                        $amNeedFit_ = "13:30";
+                                    } else {
+                                        $amNeedFit_ = $tmpEnd;
+                                    }
+                                } else if ($tmpEndTime == strtotime("18:00") && $tmpBeginTime >= $amNeedFitTime) {
+                                    if ($tmpBegin == "13:00") {
+                                        $pmNeedFit_ = $tmpBegin;
+                                    } else {
+                                        $pmNeedFit_ = "12:00";
+                                    }
                                 }
                                 switch ($exception["type"]) {
                                     case 1:
-                                        $selectSheet->SetCellValue("G$rows", "$delayTimes" . "h");
+                                        $selectSheet->SetCellValue("G$rows", "$delayTime" . "h");
                                         break;
                                     case 2:
-                                        $selectSheet->SetCellValue("H$rows", "$delayTimes" . "h");
+                                        $selectSheet->SetCellValue("H$rows", "$delayTime" . "h");
                                         break;
                                     case 3:
-                                        $selectSheet->SetCellValue("I$rows", "$delayTimes" . "h");
+                                        $selectSheet->SetCellValue("I$rows", "$delayTime" . "h");
                                         break;
                                     case 4:
-                                        $selectSheet->SetCellValue("J$rows", "外出$delayTimes" . "h");
+                                        $delayTime = round($delayTime, 1);
+                                        $remarkTmp .= "外出$delayTime" . "h;";
+                                        break;
+                                    case 5:
+                                        $delayTime = round($delayTime, 1);
+                                        $remarkTmp .= "丧假$delayTime" . "h;";
+                                        break;
+                                    case 6:
+                                        $delayTime = round($delayTime, 1);
+                                        $remarkTmp .= "年假$delayTime" . "h;";
                                         break;
                                 }
                                 if (!$remark && $exception["type"] != 4 && $exception["remark"]) {
@@ -300,9 +317,12 @@ class AttendanceServiceImpl implements AttendanceService
                             if (!$amTime || strtotime($amTime) > strtotime($amNeedFit_)) { // 迟到
                                 $delay = 0;
                                 if (!$amTime) {
-                                    $delay = (strtotime($pmTime) - strtotime($amNeedFit_))/60 - 90;
+//                                    $delay = (strtotime($pmTime) - strtotime($amNeedFit_))/60 - 90;
                                 } else {
                                     $delay = (strtotime($amTime) - strtotime($amNeedFit_)) / 60;
+                                }
+                                if ($eId == "424") {
+                                    $a =1;
                                 }
                                 $color = "";
                                 // 如果迟到在一个小时内，并且前天加班到九点半后

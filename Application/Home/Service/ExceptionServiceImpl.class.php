@@ -37,7 +37,7 @@ class ExceptionServiceImpl implements ExceptionService
         }
         $exceptionMap = array("事假" => 1, "病假" => 2, "调休" => 3, "外出" => 4, "丧假" => 5, "年假" => 6, "婚假" => 7, "产假" => 8);
         $dataList = array();
-        for ($currentRow = 2; $currentRow <= $allRow; $currentRow++) {
+        for ($currentRow = 1; $currentRow <= $allRow; $currentRow++) {
             $data = array();
             $realName = $currentSheet->getCell("A$currentRow")->getValue();
             $type = $currentSheet->getCell("B$currentRow")->getValue();

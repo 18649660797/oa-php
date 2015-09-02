@@ -55,6 +55,17 @@
     (function($) {
         $(function() {
             BUI.use('bui/calendar',function(Calendar){
+                var form = new BUI.Form.HForm({
+                    srcNode : '#J_FORM'
+                }).render();
+
+                form.on('beforesubmit',function(ev) {
+                    //序列化成对象
+                    var obj = form.serializeToObject();
+                    obj.start = 0; //返回第一页
+                    store.load(obj);
+                    return false;
+                });
                 var inputEl = $('#J_Month'),
                     monthpicker = new BUI.Calendar.MonthPicker({
                         trigger : inputEl,
@@ -124,19 +135,13 @@
                             }
                             return result;
                         }},
-                        {title: '旷工', dataIndex: '', width: 60, renderer: function(val, row) {
-                            return (row["am_time"] || row["pm_time"]) ? "" : "是";
-                        }},
-                        {title: '请假', dataIndex: 'remark', width: 60, renderer: function(val, row) {
-                            return "";
-                        }},
                         {title: '操作', dataIndex: 'id', width: 100, renderer: function(val, row) {
                             return edy.rendererHelp.createLink("/index.php/home/attendance/edit?id=" + val, "编辑")
                         }}
                     ];
                 var store = new Store({
                     url : '/index.php/home/attendance/data',
-                    autoLoad:true, //自动加载数据
+//                    autoLoad:true, //自动加载数据
 //                        params : $("#J_FORM").serialize(),
                     pageSize:10	// 配置分页数目
                 }),
@@ -262,18 +267,9 @@
                     },
                 });
                 grid.render();
+                var obj = form.serializeToObject();
+                store.load(obj);
 
-                var form = new BUI.Form.HForm({
-                    srcNode : '#J_FORM'
-                }).render();
-
-                form.on('beforesubmit',function(ev) {
-                    //序列化成对象
-                    var obj = form.serializeToObject();
-                    obj.start = 0; //返回第一页
-                    store.load(obj);
-                    return false;
-                });
             });
 
         });

@@ -74,7 +74,7 @@
                 ];
             var store = new Store({
                 url : '/index.php/home/exception/data',
-                autoLoad:true, //自动加载数据
+                autoLoad:false, //自动加载数据
 //                        params : $("#J_FORM").serialize(),
                 pageSize:30	// 配置分页数目
             }),
@@ -138,6 +138,8 @@
                 store.load(obj);
                 return false;
             });
+            var obj = form.serializeToObject();
+            store.load(obj);
             function getSelections() {
                 var selections = grid.getSelection();
                 var ids = [];

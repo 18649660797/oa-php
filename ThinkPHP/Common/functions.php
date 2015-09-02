@@ -1549,7 +1549,7 @@ function in_array_case($value,$array){
     return in_array(strtolower($value),array_map('strtolower',$array));
 }
 
-function query($model, $relationQuery = false) {
+function query($model, $relationQuery = false, $fields = "") {
     $data = D($model);
     if (I("join")) {
         $data ->alias("a");
@@ -1561,7 +1561,11 @@ function query($model, $relationQuery = false) {
     $condition = condition();
     $data -> where($condition);
     $data  -> limit(I("start") . "," . I("limit"));
-    $result["rows"] = $data -> select();
+    if ($fields) {
+        $result["rows"] = $data -> getField($fields, true);
+    } else {
+        $result["rows"] = $data -> select();
+    }
     $result["results"] = getCount($model, $relationQuery);
     return $result;
 }

@@ -43,18 +43,16 @@ class AttendanceController extends BasicController
         $exceptionGroup = array(
             "产品部"=>array(
                 "A19"=>array(
-                    array(5, "08-04", "09:00", "18:00"),
-                    array(5, "08-05", "09:00", "18:00"),
                     array(1, "08-17", "09:00", "18:00"),
-                    array(1, "08-18", "11:00", "18:00")
+                    array(1, "08-18", "11:00", "18:00"),
+                    array(5, "08-04", "09:00", "18:00"),
+                    array(5, "08-05", "09:00", "18:00")
                 ),
                 "A28"=>array(
-                    array(1, "08-07", "09:00", "12:00"),
                     array(1, "08-11", "09:00", "12:00"),
                     array(1, "08-17", "09:00", "12:00"),
                     array(1, "08-12", "09:00", "11:00"),
-                    array(1, "08-22", "09:00", "18:00"),
-                    array(1, "08-24", "09:00", "12:00")
+                    array(1, "08-20", "09:00", "12:00")
                 ),
                 "A55"=>array(
                     array(1, "08-04", "09:00", "18:00"),
@@ -63,8 +61,8 @@ class AttendanceController extends BasicController
                     array(1, "08-22", "17:00", "18:00")
                 ),
                 "A60"=>array(
-                    array(1, "08-05", "13:30", "18:00"),
-                    array(1, "08-17", "09:00", "12:00")
+                    array(1, "08-17", "09:00", "12:00"),
+                    array(1, "08-05", "13:30", "18:00")
                 ),
                 "A31"=>array(
                     array(3, "08-10", "09:00", "18:00")
@@ -93,8 +91,7 @@ class AttendanceController extends BasicController
                 "A53"=>array(
                     array(3, "08-28", "09:00", "10:00"),
                     array(3, "08-24", "09:00", "18:00"),
-                    array(3, "08-10", "09:00", "18:00"),
-                    array(3, "08-31", "09:00", "09:30")
+                    array(3, "08-10", "09:00", "18:00")
                 ),
                 "A33"=>array(
                     array(2, "08-21", "09:00", "18:00"),
@@ -115,7 +112,7 @@ class AttendanceController extends BasicController
                 ),
                 "A40"=>array(
                     array(3, "08-29", "09:00", "18:00"),
-                    array(1, "08-09", "09:00", "18:00")
+                    array(1, "08-08", "09:00", "18:00")
                 ),
                 "A49"=>array(
                     array(3, "08-22", "09:00", "18:00"),
@@ -132,7 +129,6 @@ class AttendanceController extends BasicController
                 ),
                 "A47"=>array(
                     array(3, "08-31", "09:00", "18:00"),
-                    array(3, "08-20", "10:00", "15:00"),
                     array(3, "08-20", "10:00", "15:00")
                 ),
                 "A46"=>array(
@@ -163,7 +159,8 @@ class AttendanceController extends BasicController
                 "A35"=>array(
                     array(1, "08-27", "13:30", "18:00"),
                     array(1, "08-26", "09:00", "18:00"),
-                    array(1, "08-08", "09:00", "18:00")
+                    array(1, "08-08", "09:00", "18:00"),
+                    array(1, "08-20", "09:00", "18:00")
                 )
             ),
             "市场"=>array(
@@ -183,14 +180,13 @@ class AttendanceController extends BasicController
                 "A54"=>array(
                     array(1, "08-24", "09:00", "15:30"),
                     array(1, "08-18", "09:00", "14:30"),
-                    array(3, "08-17", "09:00", "18:00"),
-                    array(3, "08-31", "09:00", "18:00")
+                    array(1, "08-17", "09:00", "18:00"),
+                    array(1, "08-31", "09:00", "18:00")
                 ),
                 "A13"=>array(
                     array(1, "08-22", "09:00", "18:00"),
-                    array(1, "08-03", "09:00", "18:00"),
-                    array(3, "08-04", "14:00", "18:00"),
-                    array(1, "08-31", "09:00", "12:00")
+                    array(6, "08-03", "09:00", "18:00"),
+                    array(1, "08-04", "14:00", "18:00")
                 ),
                 "A26"=>array(
                     array(2, "08-27", "09:00", "18:00"),
@@ -198,11 +194,10 @@ class AttendanceController extends BasicController
                 ),
                 "A14"=>array(
                     array(1, "08-22", "09:00", "18:00"),
-                    array(1, "08-29", "09:00", "18:00")
+                    array(1, "08-29", "09:00", "18:00"),
                 ),
                 "A34"=>array(
-                    array(1, "08-25", "09:00", "18:00"),
-                    array(3, "08-31", "09:00", "12:00")
+                    array(1, "08-25", "09:00", "18:00")
                 ),
                 "A11"=>array(
                     array(2, "08-17", "09:00", "11:00")
@@ -229,7 +224,7 @@ class AttendanceController extends BasicController
                 ),
                 "A30"=>array(
                     array(1, "08-25", "09:00", "12:00")
-                )
+                ),
             )
         );
         $rows = 1;
@@ -252,7 +247,8 @@ class AttendanceController extends BasicController
 
     public function data()
     {
-        $result = query("Attendance", true);
+        $fields = "a.id,a.work_date,a.am_time,a.pm_time,a.remark,e.real_name,e.department";
+        $result = query("Attendance", true, $fields);
         $dao = M("Attendance");
         $rows = array();
         foreach ($result["rows"] as $one) {
@@ -395,6 +391,13 @@ class AttendanceController extends BasicController
         }
     }
 
-
+    public function test() {
+        $dao = D("Attendance");
+        $dao->relation(true);
+        $dao->alias("a")->join("edy_employee e on e.id = a.e_id");
+        $dataList = $dao->getField("a.id,a.work_date,a.am_time,a.pm_time,a.remark", true);
+//        $dataList = $dao->select();
+        var_dump($dataList);
+    }
 
 }
