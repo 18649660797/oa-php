@@ -88,11 +88,18 @@
                     text = node.text,
                     href = node.href;
                 if (node.leaf) {
-                    tab.addTab({
-                        title : text,
-                        href : href,
-                        id : id
-                    });
+                    console.log(tab.getItemById(id));
+                    if (tab.getItemById(id)) {
+                        tab.getItemById(id).reload();
+                        tab.setActived(id);
+                    } else {
+                        tab.addTab({
+                            title : text,
+                            href : href,
+                            id : id
+                        });
+                    }
+
                 }
             });
         });
