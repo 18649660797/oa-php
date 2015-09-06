@@ -13,5 +13,5 @@ interface AttendanceService
     function init($month);
     function getAttendanceGroupByMonth($month);
     function getExceptionGroupByMonth($month);
-    function analysisAttendanceByMonth($attendanceGroup, $exceptionList);
+    function analysisAttendanceByMonth($month);
 }

@@ -142,6 +142,7 @@ class AttendanceServiceImpl implements AttendanceService
         $exceptionGroup = array();
         // 分组数据
         foreach ($exceptionList as $exception) {
+            $exception = $this->rebuildException($exception);
             if (array_key_exists($exception["e_id"], $exceptionGroup)) {
                 $exceptionGroup[$exception["e_id"]][] = $exception;
             } else {
@@ -149,6 +150,15 @@ class AttendanceServiceImpl implements AttendanceService
             }
         }
         return $exceptionGroup;
+    }
+
+    function rebuildException($exception) {
+        if (!$exception) {
+            return $exception;
+        }
+        $exception["begin_times"] = strtotime($exception["begin_time"]);
+        $exception["end_times"] = strtotime($exception["end_time"]);
+        return $exception;
     }
 
     function newPhpExcel($creator, $operator, $desc)
@@ -173,8 +183,16 @@ class AttendanceServiceImpl implements AttendanceService
     public static $delayTimesLimit = 3;
     // 个人每月早退限制次数
     public static $overlayTimesLimit = 4;
-    function analysisAttendanceByMonth($attendanceGroup, $exceptionGroup)
+    function analysisAttendanceByMonth($month)
     {
+        if (!$month) {
+            return null;
+        }
+        $attendanceService = new AttendanceServiceImpl();
+        // 当月考勤根据员工分组
+        $attendanceGroup = $attendanceService->getAttendanceGroupByMonth($month);
+        // 获取当月的所有异常情况
+        $exceptionGroup = $attendanceService->getExceptionGroupByMonth($month);
         import("Org.Util.PHPExcel");
         $admin = session("S_UNAME");
         $objPHPExcel = $this->newPhpExcel($admin, $admin, "考勤分析");
@@ -253,15 +271,33 @@ class AttendanceServiceImpl implements AttendanceService
                     // 如果此人当月有异常情况
                     $exceptionList = array_key_exists($eId, $exceptionGroup) ? $exceptionGroup[$eId] : null;
                     if ($exceptionList) {
+                        $amTimes = strtotime($workDate . " 09:00:00");
+                        $pmTimes = strtotime($workDate . " 18:00:00");
                         foreach ($exceptionList as $exception) {
                             $beginTime = $exception["begin_time"];
+                            $beginTimes = $exception["begin_times"];
                             $endTime = $exception["end_time"];
-                            $pos1 = strpos($beginTime, $workDate);
-                            $pos2 = strpos($endTime, $workDate);
-                            if ((is_numeric($pos1) && $pos1 > -1) || (is_numeric($pos2) && $pos2 > -1)) {
-                                $tmpEnd = substr($endTime, 11, 5);
+                            $endTimes = $exception["end_times"];
+//                            $pos1 = strpos($beginTime, $workDate);
+//                            $pos2 = strpos($endTime, $workDate);
+//                            if ((is_numeric($pos1) && $pos1 > -1) || (is_numeric($pos2) && $pos2 > -1)) {
+//                            if ("2015-08-14" == $workDate && $eId == 392) {
+//                                $a = 1;
+//                                echo $a;
+//                            }
+                            if (($beginTimes <= $amTimes && $endTimes >= $amTimes) || ($beginTimes <= $pmTimes && $endTimes >= $pmTimes)) {
+
+                                if ($endTimes > strtotime($workDate . " $pmNeedFit_:00")) {
+                                    $tmpEnd = $pmNeedFit_;
+                                } else {
+                                    $tmpEnd = substr($endTime, 11, 5);
+                                }
                                 $tmpEndTime = strtotime($tmpEnd);
-                                $tmpBegin = substr($beginTime, 11, 5);
+                                if ($beginTimes < strtotime($workDate . " $amNeedFit_:00")) {
+                                    $tmpBegin = "09:00";
+                                } else {
+                                    $tmpBegin = substr($beginTime, 11, 5);
+                                }
                                 $tmpBeginTime = strtotime($tmpBegin);
                                 $delayTime = ($tmpEndTime - $tmpBeginTime) / 3600.0;
                                 if ($tmpBeginTime < strtotime("12:00") && $tmpEndTime > strtotime("12:00")) {

@@ -24,6 +24,7 @@ class EmployeeController extends BasicController
     }
 
     public function data() {
+        $_REQUEST["like_real_name"] = $_REQUEST["real_name"];
         $result = query("Employee");
         echo json_encode($result);
     }

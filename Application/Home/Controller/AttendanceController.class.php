@@ -367,14 +367,10 @@ class AttendanceController extends BasicController
 
     public function analysis($month)
     {
-        if ($month) {
-            $attendanceService = new AttendanceServiceImpl();
-            // 当月考勤根据员工分组
-            $attendanceGroup = $attendanceService->getAttendanceGroupByMonth($month);
-            // 获取当月的所有异常情况
-            $exceptionGroup = $attendanceService->getExceptionGroupByMonth($month);
-            // 分析导出excel
-            $objPHPExcel = $attendanceService->analysisAttendanceByMonth($attendanceGroup, $exceptionGroup);
+        $attendanceService = new AttendanceServiceImpl();
+        // 分析导出excel
+        $objPHPExcel = $attendanceService->analysisAttendanceByMonth($month);
+        if ($objPHPExcel) {
             ExcelUtils::excel($objPHPExcel, "考勤分析数据");
         }
     }
