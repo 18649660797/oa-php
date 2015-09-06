@@ -9,9 +9,11 @@
 namespace Home\Service;
 
 
+use Home\Utils\ExcelUtils;
+
 class ExceptionServiceImpl implements ExceptionService
 {
-    function import($formatDate = false)
+    function import()
     {
         import("Org.Util.PHPExcel");
         $filePath = $_FILES["file"]["tmp_name"];
@@ -45,12 +47,11 @@ class ExceptionServiceImpl implements ExceptionService
             $endTime = $currentSheet->getCell("D$currentRow")->getValue();
             $remark = $currentSheet->getCell("E$currentRow")->getValue();
             $data["e_id"] = $employeeMap[$realName];
-            if ($formatDate) {
-                $data["begin_time"] = "20" . \PHPExcel_Style_NumberFormat::toFormattedString($beginTime, "Y-m-d H:i:s");
-                $data["end_time"] = "20" . \PHPExcel_Style_NumberFormat::toFormattedString($endTime, "Y-m-d H:i:s");
-            } else {
-                $data["begin_time"] = $beginTime;
-                $data["end_time"] = $endTime;
+            if (ExcelUtils::isDate($currentSheet->getCell("C$currentRow"))) {
+                $data["begin_time"] = ExcelUtils::phpDateToObjectDate($beginTime);
+            }
+            if (ExcelUtils::isDate($currentSheet->getCell("D$currentRow"))) {
+                $data["end_time"] = ExcelUtils::phpDateToObjectDate($endTime);
             }
             $data["type"] = $exceptionMap[$type];
             $data["remark"] = $remark;

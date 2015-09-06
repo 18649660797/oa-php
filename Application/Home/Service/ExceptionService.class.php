@@ -11,5 +11,5 @@ namespace Home\Service;
 
 interface ExceptionService
 {
-    function import($formatDate = false);
+    function import();
 }

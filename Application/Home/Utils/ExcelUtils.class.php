@@ -22,4 +22,18 @@ class ExcelUtils
         $objWriter = new \PHPExcel_Writer_Excel2007($excel);
         $objWriter->save('php://output');
     }
+
+    public static function isDate($cell)
+    {
+        $cellstyleformat = $cell->getStyle($cell->getCoordinate())->getNumberFormat();
+        $formatcode = $cellstyleformat->getFormatCode();
+        return preg_match('/^(\[\$[A-Z]*-[0-9A-F]*\])*[hmsdy]/i', $formatcode);
+    }
+
+    public static function phpDateToObjectDate($date)
+    {
+        import("Org.Util.PHPExcel");
+        return "20" . \PHPExcel_Style_NumberFormat::toFormattedString($date, "Y-m-d H:i:s");
+    }
+
 }
