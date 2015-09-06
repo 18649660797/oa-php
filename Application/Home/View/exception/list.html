@@ -14,6 +14,12 @@
                 <label>姓名：</label>
                 <input type="text" class="control-text" name="like_e:real_name" value="" />
 
+                <label>开始时间：</label><input name="between_a:begin_time" type="text" class="calendar" /> <label>至</label> <input name="between_a:begin_time" type="text" class="calendar" />
+                <label>结束时间：</label><input name="between_a:end_time" type="text" class="calendar" /> <label>至</label> <input name="between_a:end_time" type="text" class="calendar" />
+            </span>
+        </div>
+        <ul class="panel-content">
+            <li>
                 <label>假别：</label>
                 <select name="eq_a:type">
                     <option value="">全部</option>
@@ -40,10 +46,6 @@
                     <option value="客户中心">客户中心</option>
                     <option value="云智盛世">云智盛世</option>
                 </select>
-            </span>
-        </div>
-        <ul class="panel-content">
-            <li>
                 <button type="submit" class="button button-primary">查询>></button>
             </li>
         </ul>
@@ -60,17 +62,17 @@
             var Grid = Grid,
                 Store = Data.Store,
                 columns = [
-                    {title: 'id', dataIndex: 'id', width: 60},
+                    {title: 'id', dataIndex: 'id', width: 60, renderer: function(val, row) {
+                        return edy.rendererHelp.createLink("/index.php/home/exception/edit?id=" + val, val)
+                    }},
                     {title: '姓名', dataIndex: 'real_name', width: 60},
+                    {title: '部门', dataIndex: 'department', width: 60},
                     {title: '类型', dataIndex: 'type', width: 60, renderer: function(val, row) {
                         return {1: "事假", 2: "病假", 3: "调休", 4: "外出", 5: "丧假", 6: "年假", 7: "婚假", 8: "产假"}[val];
                     }},
                     {title: '开始日期', dataIndex: 'begin_time', width: 150},
                     {title: '结束时间', dataIndex: 'end_time', width: 150},
-                    {title: '备注', dataIndex: 'remark', width: 150},
-                    {title: '操作', dataIndex: 'id', width: 60, renderer: function(val, row) {
-                        return edy.rendererHelp.createLink("/index.php/home/exception/edit?id=" + val, "编辑")
-                    }}
+                    {title: '备注', dataIndex: 'remark', width: 150}
                 ];
             var store = new Store({
                 url : '/index.php/home/exception/data',

@@ -49,13 +49,12 @@
             var Grid = Grid,
                 Store = Data.Store,
                 columns = [
-                    {title: 'id', dataIndex: 'id', width: 60},
+                    {title: 'id', dataIndex: 'id', width: 60, renderer: function(val, row) {
+                        return edy.rendererHelp.createLink("/index.php/home/exception/edit?id=" + val, val)
+                    }},
                     {title: '姓名', dataIndex: 'real_name', width: 60},
                     {title: '考勤号', dataIndex: 'attendance_cn', width: 60},
-                    {title: '部门', dataIndex: 'department', width: 100},
-                    {title: '操作', dataIndex: 'id', width: 60, renderer: function(val, row) {
-                        return edy.rendererHelp.createLink("/index.php/home/employee/edit?id=" + val, "编辑")
-                    }}
+                    {title: '部门', dataIndex: 'department', width: 100}
                 ];
             var store = new Store({
                 url : '/index.php/home/employee/data',
