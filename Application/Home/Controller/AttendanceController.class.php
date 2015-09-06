@@ -13,7 +13,6 @@ use Home\Utils\DateUtils;
 use Home\Utils\ExcelUtils;
 use Home\Utils\RenderUtil;
 use Home\Utils\StringUtils;
-use Think\Log;
 
 class AttendanceController extends BasicController
 {
@@ -390,20 +389,6 @@ class AttendanceController extends BasicController
             $objPHPExcel = $attendanceService->analysisAttendanceByMonth($attendanceGroup, $exceptionGroup);
             ExcelUtils::excel($objPHPExcel, "考勤分析数据");
         }
-    }
-
-    function log($msg) {
-        Log::record($msg,'WARN',true);
-        Log::write($msg, 'WARN');
-    }
-
-    public function test() {
-        $dao = D("Attendance");
-        $dao->relation(true);
-        $dao->alias("a")->join("edy_employee e on e.id = a.e_id");
-        $dataList = $dao->getField("a.id,a.work_date,a.am_time,a.pm_time,a.remark", true);
-//        $dataList = $dao->select();
-        var_dump($dataList);
     }
 
 }

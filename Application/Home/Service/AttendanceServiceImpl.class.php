@@ -131,7 +131,7 @@ class AttendanceServiceImpl implements AttendanceService
         $exceptionDao->alias("a")->join("edy_employee e on e.id=a.e_id");
         $condition = array();
         $condition["a.begin_time"] = array(array("like", "$month%"));
-        $exceptionList = $exceptionDao->where($condition)->getField("a.begin_time,a.end_time,a.e_id,a.type,a.remark");
+        $exceptionList = $exceptionDao->where($condition)->getField("a.id,a.begin_time,a.end_time,a.e_id,a.type,a.remark");
         // 异常分组
         $exceptionGroup = array();
         // 分组数据
@@ -158,6 +158,15 @@ class AttendanceServiceImpl implements AttendanceService
         return $objPHPExcel;
     }
 
+    // 需要打卡的时间
+    public static $amNeedFit = "09:03";
+    public static $amNeedFitTime = 1441155780;
+    public static $pmNeedFit = "18:00";
+    public static $pmNeedFitTime = 1441188000;
+    // 个人每月15分钟内迟到限制次数
+    public static $delayTimesLimit = 3;
+    // 个人每月早退限制次数
+    public static $overlayTimesLimit = 4;
     function analysisAttendanceByMonth($attendanceGroup, $exceptionGroup)
     {
         import("Org.Util.PHPExcel");
@@ -191,15 +200,6 @@ class AttendanceServiceImpl implements AttendanceService
         $selectSheet->SetCellValue('M2', '旷工');
         // 从第三行开始填充数据
         $rows = 3;
-        // 个人每月15分钟内迟到限制次数
-        $delayTimesLimit = 3;
-        // 个人每月早退限制次数
-        $overlayTimesLimit = 4;
-        // 需要打卡的时间
-        $amNeedFit = "09:03";
-        $amNeedFitTime = strtotime($amNeedFit);
-        $pmNeedFit = "18:00";
-        $pmNeedFitTime = strtotime($pmNeedFit);
         // 遍历每个人
         foreach ($attendanceGroup as $attendanceList) {
             // 个人每月15分钟内迟到次数
@@ -228,14 +228,6 @@ class AttendanceServiceImpl implements AttendanceService
                 $eId = $attendance["e_id"];
                 // 备注
                 $remark = $attendance["remark"];
-                // 清除掉上午和下午打卡时间一致的情况
-//                if ($amTime == $pmTime) {
-//                    if (strtotime($amTime) > strtotime("12:00")) {
-//                        $amTime = null;
-//                    } else {
-//                        $pmTime = null;
-//                    }
-//                }
                 if (strtotime("12:00") - strtotime($pmTime) > 0) {
                     $pmTime = null;
                 }
@@ -250,11 +242,8 @@ class AttendanceServiceImpl implements AttendanceService
                     $selectSheet->getStyle("C$rows")->getFont()->getColor()->setARGB(\PHPExcel_Style_Color::COLOR_BLUE);
                 } else {
                     $continue = true;
-                    $amNeedFit_ = $amNeedFit;
-                    if (strtotime($workDate) >= strtotime("2015-08-21")) {
-                        $amNeedFit_ = "09:08";
-                    }
-                    $pmNeedFit_ = $pmNeedFit;
+                    $amNeedFit_ =AttendanceServiceImpl::$amNeedFit;
+                    $pmNeedFit_ =AttendanceServiceImpl::$pmNeedFit;
                     // 如果此人当月有异常情况
                     $exceptionList = array_key_exists($eId, $exceptionGroup) ? $exceptionGroup[$eId] : null;
                     if ($exceptionList) {
@@ -274,7 +263,7 @@ class AttendanceServiceImpl implements AttendanceService
                                 }
                                 if ($delayTime >= 7.5) {
                                     $continue = false;
-                                } else if ($tmpBeginTime > $amNeedFitTime && $tmpEndTime < $pmNeedFitTime) {
+                                } else if ($tmpBeginTime > AttendanceServiceImpl::$amNeedFitTime && $tmpEndTime < AttendanceServiceImpl::$pmNeedFitTime) {
                                     // 如果处于中间的话，不处理
                                 } else if ($tmpBeginTime == strtotime("09:00") && $tmpEndTime <= strtotime("18:00")) {
                                     if ($tmpEnd == "12:00") {
@@ -282,7 +271,7 @@ class AttendanceServiceImpl implements AttendanceService
                                     } else {
                                         $amNeedFit_ = $tmpEnd;
                                     }
-                                } else if ($tmpEndTime == strtotime("18:00") && $tmpBeginTime >= $amNeedFitTime) {
+                                } else if ($tmpEndTime == strtotime("18:00") && $tmpBeginTime >= AttendanceServiceImpl::$amNeedFitTime) {
                                     if ($tmpBegin == "13:00") {
                                         $pmNeedFit_ = $tmpBegin;
                                     } else {
@@ -331,16 +320,12 @@ class AttendanceServiceImpl implements AttendanceService
                                 } else {
                                     $delay = (strtotime($amTime) - strtotime($amNeedFit_)) / 60;
                                 }
-                                if ($eId == "424") {
-                                    $a = 1;
-                                }
-                                $color = "";
                                 // 如果迟到在一个小时内，并且前天加班到九点半后
                                 if ($previous && $delay < 60 && strtotime($previous["pm_time"]) > strtotime("21:30")) {
                                     $color = "FF9AFF9A";
                                 } else if ($delay <= 15) { // 如果迟到在十五分钟内
                                     // 如果迟到次数还没到
-                                    if ($delayTimes++ < $delayTimesLimit) {
+                                    if ($delayTimes++ < AttendanceServiceImpl::$delayTimesLimit) {
                                         $color = "FF00F5FF";
                                     } else {
                                         $applyMoneyAm += 10;
@@ -376,7 +361,7 @@ class AttendanceServiceImpl implements AttendanceService
                                     $overlay = (strtotime($pmNeedFit_) - strtotime($pmTime)) / 60;
                                     $selectSheet->SetCellValue("L$rows", "早退 $overlay 分钟");
                                 }
-                                if ($overlayTimes++ < $overlayTimesLimit) {
+                                if ($overlayTimes++ < AttendanceServiceImpl::$overlayTimesLimit) {
                                     $remarkTmp .= "早退补卡;";
                                 } else {
                                     $applyMoneyPm += 10;
@@ -397,6 +382,5 @@ class AttendanceServiceImpl implements AttendanceService
         $selectSheet->setTitle('sheet1');
         return $objPHPExcel;
     }
-
 
 }
