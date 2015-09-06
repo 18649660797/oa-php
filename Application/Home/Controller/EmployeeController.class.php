@@ -9,6 +9,7 @@
 namespace Home\Controller;
 
 
+use Home\Service\EmployeeServiceImpl;
 use Home\Utils\RenderUtil;
 use Think\Controller;
 
@@ -35,6 +36,7 @@ class EmployeeController extends BasicController
         }
         $employee["real_name"] = I("realName");
         $employee["attendance_cn"] = I("attendanceCn");
+        $employee["department"] = I("department");
         $dao = M("Employee");
         if ($id) {
             $dao->save($employee);
@@ -109,6 +111,18 @@ class EmployeeController extends BasicController
         $str = iconv('utf-8','gbk', $str);
         $str = iconv('gbk','utf-8', $str);
         return $str;
+    }
+
+    public function getRealNames($real_name = "", $callback)
+    {
+        $service = new EmployeeServiceImpl();
+        $service->suggestRealNames($real_name, $callback);
+    }
+
+    public function getAttendanceCn($attendance_cn = "", $callback)
+    {
+        $service = new EmployeeServiceImpl();
+        $service->suggestAttendanceCn($attendance_cn, $callback);
     }
 
 }

@@ -18,7 +18,8 @@
                 <label>打卡日期：</label><input name="between_a:work_date" type="text" class="calendar" /> <label>至</label> <input name="between_a:work_date" type="text" class="calendar" />
 
                 <label>姓名：</label>
-                <input type="text" class="control-text" name="like_e:real_name" value="" />
+                <!--<input type="text" class="control-text" name="like_e:real_name" value="" />-->
+                <div class="suggest" id="realName"></div>
 
                 <label>部门：</label>
                 <select name="eq_e:department">
@@ -36,9 +37,9 @@
             </div>
             <ul class="panel-content">
                 <li>
-                    <label class="control-text">迟到：</label><input style="width:20px;" type="checkbox" name="gt_a:am_time" value="09:00" />
-                    <label class="control-text">早退：</label><input style="width:20px;" type="checkbox" name="lt_a:pm_time" value="18:00" />
-                    <label class="control-text">迟到15分钟内：</label><input style="width:20px;" type="checkbox" name="between_a:am_time" value="09:00,09:15" />
+                    <label class="control-text">迟到：</label><input style="width:20px;" id="delay" type="checkbox" name="gt_a:am_time" value="09:00" />
+                    <label class="control-text">早退：</label><input style="width:20px;" id="early" type="checkbox" name="lt_a:pm_time" value="18:00" />
+                    <label class="control-text">迟到15分钟内：</label><input style="width:20px;" type="checkbox" id="delay15min" name="between_a:am_time" value="09:00,09:15" />
                     <button type="submit" class="button button-primary">查询>></button>
                 </li>
             </ul>
@@ -95,21 +96,24 @@
                         monthpicker.set('month', month);
                     }
                 });
-
+                var now = new Date(), year = now.getFullYear(), month = now.getMonth();
+                inputEl.val(year + "-" + (month < 10 ? "0" + month : month));
                 var Grid = BUI.Grid,
                         Data = BUI.Data;
                 var Grid = Grid,
                     Store = Data.Store,
                     columns = [
-//                        {title: 'id', dataIndex: 'id', width: 60},
+                        {title: '操作', dataIndex: 'id', width: 80, renderer: function(val, row) {
+                            return edy.rendererHelp.createLink("/index.php/home/attendance/edit?id=" + val, "编辑")
+                        }},
+                        {title: 'id', dataIndex: 'id', width: 60},
                         {title: '姓名', dataIndex: 'real_name', width: 80},
                         {title: '部门', dataIndex: 'department', width: 80},
                         {title: '打卡日期', dataIndex: 'work_date', width: 100},
                         {title: '上午打卡', dataIndex: 'am_time', width: 80},
                         {title: '下午打卡', dataIndex: 'pm_time', width: 80},
                         {title: '前日晚卡', dataIndex: 'yesterday', width: 80},
-                        {title: '备注', dataIndex: 'remark', width: 80},
-                        {title: '迟到', dataIndex: 'am_time', width: 100, renderer: function(val, row) {
+                        {title: '迟到', dataIndex: 'am_time', width: 80, renderer: function(val, row) {
                             if (!val) {
                                 return "";
                             }
@@ -122,7 +126,7 @@
                             }
                             return result;
                         }},
-                        {title: '早退', dataIndex: 'pm_time', width: 100, renderer: function(val, row) {
+                        {title: '早退', dataIndex: 'pm_time', width: 80, renderer: function(val, row) {
                             if (!val) {
                                 return "";
                             }
@@ -135,13 +139,11 @@
                             }
                             return result;
                         }},
-                        {title: '操作', dataIndex: 'id', width: 100, renderer: function(val, row) {
-                            return edy.rendererHelp.createLink("/index.php/home/attendance/edit?id=" + val, "编辑")
-                        }}
+                        {title: '备注', dataIndex: 'remark', width: 80}
                     ];
                 var store = new Store({
                     url : '/index.php/home/attendance/data',
-//                    autoLoad:true, //自动加载数据
+                    autoLoad:false, //自动加载数据
 //                        params : $("#J_FORM").serialize(),
                     pageSize:10	// 配置分页数目
                 }),
@@ -251,11 +253,15 @@
                                             $.post("/index.php/home/attendance/unsetDays", {days:days}, function(data) {
 
                                             });
+                                            $("#s1 li").remove();
+                                            $("#hide").val("");
                                             select.destroy();
                                             calendar.destroy();
                                             this.close();
                                         },
                                         cancel: function() {
+                                            $("#s1 li").remove();
+                                            $("#hide").val("");
                                             select.destroy();
                                             calendar.destroy();
                                             this.close();
@@ -267,9 +273,30 @@
                     },
                 });
                 grid.render();
+                var form = new BUI.Form.HForm({
+                    srcNode : '#J_FORM'
+                }).render();
+                form.on('beforesubmit',function(ev) {
+                    //序列化成对象
+                    var obj = form.serializeToObject();
+                    obj.start = 0; //返回第一页
+                    var lastParams = store.get("lastParams");
+                    lastParams["between_a:am_time"] = "";
+                    lastParams["gt_a:am_time"] = "";
+                    lastParams["lt_a:pm_time"] = "";
+                    store.set("lastParams", lastParams);
+                    store.load(obj);
+                    return false;
+                });
                 var obj = form.serializeToObject();
                 store.load(obj);
-
+                var Select = BUI.Select;
+                var suggest = new Select.Suggest({
+                    render:'#realName',
+                    name:'realName',
+                    url:'/index.php/home/attendance/getRealNames'
+                });
+                suggest.render();
             });
 
         });

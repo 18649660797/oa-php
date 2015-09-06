@@ -11,7 +11,11 @@
         <div class="panel-title">
             <span>
                 <label>姓名：</label>
-                <input type="text" class="control-text" name="like_real_name" value="" />
+                <!--<input type="text" class="control-text" name="like_real_name" value="" />-->
+                <div id="realName" class="suggest"></div>
+                <label>考勤号：</label>
+                <div id="attendanceCn" class="suggest"></div>
+                <!--<input type="text" class="control-text" name="like_attendance_cn" value="" />-->
                 <label>部门：</label>
                 <select name="eq_department">
                     <option value="">全部</option>
@@ -55,7 +59,7 @@
                 ];
             var store = new Store({
                 url : '/index.php/home/employee/data',
-                autoLoad:true, //自动加载数据
+                autoLoad:false, //自动加载数据
 //                        params : $("#J_FORM").serialize(),
                 pageSize:30	// 配置分页数目
             }),
@@ -119,6 +123,21 @@
                 store.load(obj);
                 return false;
             });
+            var obj = form.serializeToObject();
+            store.load(obj);
+            var Select = BUI.Select;
+            var suggest = new Select.Suggest({
+                render:'#realName',
+                name:'real_name',
+                url:'/index.php/home/employee/getRealNames'
+            });
+            suggest.render();
+            var suggestAttendance = new Select.Suggest({
+                render:'#attendanceCn',
+                name:'attendance_cn',
+                url:'/index.php/home/employee/getAttendanceCn'
+            });
+            suggestAttendance.render();
             function getSelections() {
                 var selections = grid.getSelection();
                 var ids = [];

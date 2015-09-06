@@ -28,6 +28,23 @@
                         <input type="text" class="control-text" name="attendanceCn" value="{$entity.attendance_cn}" />
                     </div>
                 </div>
+                <div class="control-group">
+                    <label class="control-label">部门：</label>
+                    <div class="controls">
+                        <select id="department" name="department">
+                            <option value="">全部</option>
+                            <option value="产品中心">产品中心</option>
+                            <option value="开发部">开发部</option>
+                            <option value="测试部">测试部</option>
+                            <option value="运营部">运营部</option>
+                            <option value="销售部">销售部</option>
+                            <option value="市场部">市场部</option>
+                            <option value="行政部">行政部</option>
+                            <option value="客户中心">客户中心</option>
+                            <option value="云智盛世">云智盛世</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="form-actions span5 offset3">
                     <button id="btnSearch" type="submit" class="button button-primary">提交</button>
                     <button type="reset" class="button button-primary">重置</button>
@@ -48,7 +65,9 @@
                 }
             }
         }).render();
+        $("#department").val("{$entity.department}");
     });
+
 </script>
 <!-- script end -->
 </body>

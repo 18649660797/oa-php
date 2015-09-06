@@ -12,4 +12,5 @@ namespace Home\Service;
 interface EmployeeService
 {
     function suggestRealNames($realName, $callback);
+    function suggestAttendanceCn($attendanceCn, $callback);
 }

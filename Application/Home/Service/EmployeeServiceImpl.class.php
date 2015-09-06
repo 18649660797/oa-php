@@ -18,4 +18,12 @@ class EmployeeServiceImpl implements EmployeeService
         echo $callback . "(" . json_encode($result) . ")";
     }
 
+    function suggestAttendanceCn($attendanceCn, $callback)
+    {
+        header("Content-type: application/json");
+        $result = M("Employee")->where(array("attendance_cn" => array("eq", $attendanceCn)))->getField("attendance_cn", true);
+        echo $callback . "(" . json_encode($result) . ")";
+    }
+
+
 }

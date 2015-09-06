@@ -9,6 +9,7 @@
 namespace Home\Controller;
 
 use Home\Service\AttendanceServiceImpl;
+use Home\Service\EmployeeServiceImpl;
 use Home\Utils\DateUtils;
 use Home\Utils\ExcelUtils;
 use Home\Utils\RenderUtil;
@@ -247,6 +248,7 @@ class AttendanceController extends BasicController
 
     public function data()
     {
+        $_REQUEST["like_e.real_name"] = $_REQUEST["realName"];
         $fields = "a.id,a.work_date,a.am_time,a.pm_time,a.remark,e.real_name,e.department";
         $result = query("Attendance", true, $fields);
         $dao = M("Attendance");
