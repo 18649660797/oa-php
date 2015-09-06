@@ -275,11 +275,6 @@ class AttendanceController extends BasicController
         $this->display(T("attendance/list"));
     }
 
-    public function init()
-    {
-        $this->display(T("attendance/init"));
-    }
-
     public function drop()
     {
         $this->display(T("attendance/drop"));
@@ -296,15 +291,6 @@ class AttendanceController extends BasicController
         $gregorian = JDToGregorian($jd + intval($val) - 25569);
         return date("h:i", $gregorian);
         /**显示格式为 “月/日/年” */
-    }
-
-    public function initMonth($month = "")
-    {
-        if ($month) {
-            $service = new AttendanceServiceImpl();
-            $service->init($month);
-            echo json_encode(RenderUtil::success());
-        }
     }
 
     public function dropMonth($month = "")

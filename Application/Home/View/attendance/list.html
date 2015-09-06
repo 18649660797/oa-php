@@ -160,27 +160,7 @@
                     tbar:{ //添加、删除
                         items : [{
                             btnCls : 'button button-small',
-                            text : '<i class="icon-plus"></i>初始化月份',
-                            listeners : {
-                                'click' : function() {
-                                    location.href = "/index.php/home/attendance/init";
-                                }
-                            }
-                        },{
-                            btnCls : 'button button-small',
-                            text : '<i class="icon-plus"></i>导出分析数据',
-                            listeners : {
-                                'click' : function() {
-                                    var Select = BUI.Select, select, month = $("#J_Month").val(), calendar;
-                                    if (!month) {
-                                        return edy.alert("请选择一个考勤月");
-                                    }
-                                    window.open("/index.php/home/attendance/analysis?month=" + month)
-                                }
-                            }
-                        },{
-                            btnCls : 'button button-small',
-                            text : '<i class="icon-plus"></i>导入',
+                            text : '<i class="icon-plus"></i>导入考勤数据',
                             listeners : {
                                 'click' : function() {
                                     location.href = "/index.php/home/attendance/upload";
@@ -189,7 +169,7 @@
                         },
                         {
                             btnCls : 'button button-small',
-                            text : '<i class="icon-remove"></i>删除',
+                            text : '<i class="icon-remove"></i>清空月份考勤',
                             listeners : {
                                 'click' : function() {
                                     location.href = "/index.php/home/attendance/drop";
@@ -267,6 +247,18 @@
                                             this.close();
                                         }
                                     }).show();
+                                }
+                            }
+                        },{
+                            btnCls : 'button button-small',
+                            text : '<i class="icon-plus"></i>导出分析数据',
+                            listeners : {
+                                'click' : function() {
+                                    var Select = BUI.Select, select, month = $("#J_Month").val(), calendar;
+                                    if (!month) {
+                                        return edy.alert("请选择一个考勤月");
+                                    }
+                                    window.open("/index.php/home/attendance/analysis?month=" + month)
                                 }
                             }
                         }]

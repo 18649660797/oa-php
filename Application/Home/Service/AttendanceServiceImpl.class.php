@@ -72,6 +72,12 @@ class AttendanceServiceImpl implements AttendanceService
         $dao = D("Attendance");
         $dao->relation(true);
         $attendanceList = $dao->where(array("work_date" => array("like", "$month%")))->select();
+        // 如果还没有数据的话，初始化数据
+        if ((!$attendanceList || count($attendanceList) <= 0) && $month) {
+            $service = new AttendanceServiceImpl();
+            $service->init($month);
+            echo json_encode(RenderUtil::success());
+        }
         $dao2 = M("Attendance");
         foreach ($attendanceList as $one) {
             foreach ($dataList as $data) {
