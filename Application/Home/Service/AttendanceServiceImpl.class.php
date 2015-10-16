@@ -10,6 +10,7 @@ namespace Home\Service;
 
 use Home\Model\Attendance;
 use Home\Utils\DateUtils;
+use Home\Utils\RenderUtil;
 
 class AttendanceServiceImpl implements AttendanceService
 {
@@ -266,8 +267,18 @@ class AttendanceServiceImpl implements AttendanceService
                     $selectSheet->getStyle("C$rows")->getFont()->getColor()->setARGB(\PHPExcel_Style_Color::COLOR_BLUE);
                 } else {
                     $continue = true;
-                    $amNeedFit_ =AttendanceServiceImpl::$amNeedFit;
-                    $pmNeedFit_ =AttendanceServiceImpl::$pmNeedFit;
+                    $amNeedFit_ = AttendanceServiceImpl::$amNeedFit;
+                    $pmNeedFit_ = AttendanceServiceImpl::$pmNeedFit;
+                    if ($workDate == "2015-09-22") {
+                        $pmNeedFit_ = "13:33";
+                    }
+                    if ($workDate == "2015-09-23") {
+                        $amNeedFit_ = "13:33";
+                    }
+//                    $amNeedFitTime = AttendanceServiceImpl::$amNeedFitTime;
+                    $amNeedFitTime = strtotime(AttendanceServiceImpl::$amNeedFit);
+//                    $pmNeedFitTime = AttendanceServiceImpl::$pmNeedFitTime;
+                    $pmNeedFitTime = strtotime(AttendanceServiceImpl::$pmNeedFitTime);
                     // 如果此人当月有异常情况
                     $exceptionList = array_key_exists($eId, $exceptionGroup) ? $exceptionGroup[$eId] : null;
                     if ($exceptionList) {
@@ -305,7 +316,7 @@ class AttendanceServiceImpl implements AttendanceService
                                 }
                                 if ($delayTime >= 7.5) {
                                     $continue = false;
-                                } else if ($tmpBeginTime > AttendanceServiceImpl::$amNeedFitTime && $tmpEndTime < AttendanceServiceImpl::$pmNeedFitTime) {
+                                } else if ($tmpBeginTime > $amNeedFitTime && $tmpEndTime < $pmNeedFitTime) {
                                     // 如果处于中间的话，不处理
                                 } else if ($tmpBeginTime == strtotime("09:00") && $tmpEndTime <= strtotime("18:00")) {
                                     if ($tmpEnd == "12:00") {
@@ -313,7 +324,7 @@ class AttendanceServiceImpl implements AttendanceService
                                     } else {
                                         $amNeedFit_ = $tmpEnd;
                                     }
-                                } else if ($tmpEndTime == strtotime("18:00") && $tmpBeginTime >= AttendanceServiceImpl::$amNeedFitTime) {
+                                } else if ($tmpEndTime == strtotime("18:00") && $tmpBeginTime >= $amNeedFitTime) {
                                     if ($tmpBegin == "13:00") {
                                         $pmNeedFit_ = $tmpBegin;
                                     } else {
@@ -363,9 +374,9 @@ class AttendanceServiceImpl implements AttendanceService
                                     $delay = (strtotime($amTime) - strtotime($amNeedFit_)) / 60;
                                 }
                                 // 如果迟到在一个小时内，并且前天加班到九点半后
-                                if ($previous && $delay < 60 && strtotime($previous["pm_time"]) > strtotime("21:30")) {
+                                if ($previous && $delay > 0 && $delay < 60 && strtotime($previous["pm_time"]) > strtotime("21:30")) {
                                     $color = "FF9AFF9A";
-                                } else if ($delay <= 15) { // 如果迟到在十五分钟内
+                                } else if ($delay > 0 && $delay <= 15) { // 如果迟到在十五分钟内
                                     // 如果迟到次数还没到
                                     if ($delayTimes++ < AttendanceServiceImpl::$delayTimesLimit) {
                                         $color = "FF00F5FF";
@@ -374,7 +385,7 @@ class AttendanceServiceImpl implements AttendanceService
                                         $remarkTmp .= "迟到乐捐$applyMoneyAm 元;";
                                         $color = "FFFFFF00";
                                     }
-                                } else {
+                                } else if ($delay > 0 ) {
                                     $color = "FFFFFF00";
                                     if ($delay <= 30) {
                                         $applyMoneyAm += 10;
@@ -407,7 +418,7 @@ class AttendanceServiceImpl implements AttendanceService
                                     $remarkTmp .= "早退补卡;";
                                 } else {
                                     $applyMoneyPm += 10;
-                                    $remarkTmp .= "迟到乐捐$applyMoneyPm 元;";
+                                    $remarkTmp .= "早退乐捐$applyMoneyPm 元;";
                                 }
                             }
                         }

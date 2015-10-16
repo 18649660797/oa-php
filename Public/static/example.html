@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>列百分比表格</title>
+    <!-- 此文件为了显示Demo样式，项目中不需要引入 -->
+    <!--<link href="../../assets/code/demo.css" rel="stylesheet">-->
+
+    <link href="http://g.alicdn.com/bui/bui/1.1.21/css/bs3/dpl.css" rel="stylesheet">
+    <link href="http://g.alicdn.com/bui/bui/1.1.21/css/bs3/bui.css" rel="stylesheet">
+
+</head>
+<body>
+<div class="demo-content">
+    <div class="row">
+        <div class="span16">
+            <div id="grid">
+
+            </div>
+        </div>
+    </div>
+
+
+    <script src="http://g.tbcdn.cn/fi/bui/jquery-1.8.1.min.js"></script>
+    <script src="http://g.alicdn.com/bui/seajs/2.3.0/sea.js"></script>
+    <script src="http://g.alicdn.com/bui/bui/1.1.21/config.js"></script>
+
+    <!-- script start -->
+    <script type="text/javascript">
+        // 此例是需要异步处理的情况下使用，但大多数的场景下。每个表格都是单独一个页面，不需要如此特殊处理，自己组装表头参数
+        BUI.use(['bui/grid','bui/data'],function(Grid,Data){
+            var Store = Data.Store,
+                columns = [
+                    {title : 'id',dataIndex :'id', width:100},
+                    {title : '姓名',dataIndex :'name', width:100},
+                    {title : '性别',dataIndex :'sex', width:100},
+                    {title : '爱好',dataIndex :'fav', width:100}
+                ],
+                data = [
+                    {id: '1', name: "胡歌", sex: "男", fav: "搞基"},
+                    {id: '2', name: "刘涛", sex: "女", fav: "波涛汹涌"},
+                    {id: '3', name: "王凯", sex: "男", fav: "防腐"}
+                ];
+            var store = new Store({
+                    data : data
+                }),
+                grid = new Grid.Grid({
+                    render:'#grid',
+                    width:'100%',//如果表格使用百分比，这个属性一定要设置
+                    columns : columns,
+                    idField : 'a',
+                    store : store
+                });
+            grid.render();
+            window.setTimeout(function() {
+                // 获取所有的列表，但由于是已被渲染过的，不操作
+                var columns = grid.get("columns");
+                // ---- 删除所有列 start
+                var len = columns.length;
+                while (len-- > 0) {
+                    var column = grid.findColumn(len);
+                    grid.removeColumn(column);
+                }
+                // ---- 删除所有列  end
+                // 获取新列config参数
+                // columns中每一个元素必须能和field对应得上
+                // 基本属性:
+                // title(客户爱叫 用户名、客户名、微店、门店什么鬼的都自己叫去)
+                // dataIndex 这个值必须固定
+                // width 可开放，宽度
+                // renderer:可在前台渲染对应类型
+                var columns = [
+                    {title : '姓名',dataIndex :'name', width:100},
+                    {title : '爱好',dataIndex :'fav', width:100}
+                ];
+                // 逐一添加
+                for (var i = 0; i < columns.length; i++) {
+                    grid.addColumn(columns[i]);
+                }
+                // ! 如果需要重新加载数据的话，需要store.load
+                store.load();
+            }, 1000);
+        });
+    </script>
+    <!-- script end -->
+</div>
+</body>
+</html>

@@ -12,7 +12,7 @@ CREATE TABLE `edy_auth_rule` (
     `title` char(20) NOT NULL DEFAULT '',
     `type` tinyint(1) NOT NULL DEFAULT '1',
     `status` tinyint(1) NOT NULL DEFAULT '1',
-    `condition` char(100) NOT NULL DEFAULT '',  # 规则附件条件,满足附加条件的规则,才认为是有效的规则
+    `condition` char(100) NOT NULL DEFAULT '',
     PRIMARY KEY (`id`),
     UNIQUE KEY `name` (`name`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
