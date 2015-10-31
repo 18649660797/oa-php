@@ -10,18 +10,9 @@
     width: 500px;
     margin: 0 auto;
     margin-top: 10%;
-    border: solid 20px #5c637b;
+    border: solid 20px skyblue;
     padding: 15px;
     border-radius: 25px;
     box-shadow: 10px 10px 5px #888888;
 
-}
-.login-page {
-    /*FILTER: progid:DXImageTransform.Microsoft.Gradient(gradientType=0,startColorStr=#b8c4cb,endColorStr=red); /!*IE 6 7 8*!/*/
-    background: -ms-linear-gradient(top, #0000ff, #fff);        /* IE 10 */
-    background:-moz-linear-gradient(top,#b8c4cb,#f6f6f8);/*火狐*/
-    background:-webkit-gradient(linear, 0% 0%, 0% 100%,from(#f6f6f8), to(#b8c4cb));/*谷歌*/
-    background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fff), to(#0000ff));      /* Safari 4-5, Chrome 1-9*/
-    background: -webkit-linear-gradient(top, #0000ff, #fff);   /*Safari5.1 Chrome 10+*/
-    background: -o-linear-gradient(top, #fff, #0000ff);  /*Opera 11.10+*/
 }
