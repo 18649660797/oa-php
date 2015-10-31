@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>表格多选</title>
+    <!-- 此文件为了显示Demo样式，项目中不需要引入 -->
+    <link href="../../assets/code/demo.css" rel="stylesheet">
+
+    <link href="http://g.alicdn.com/bui/bui/1.1.21/css/bs3/dpl.css" rel="stylesheet">
+    <link href="http://g.alicdn.com/bui/bui/1.1.21/css/bs3/bui.css" rel="stylesheet">
+
+</head>
+<body>
+<div class="demo-content">
+    <div class="row">
+        <div class="span16">
+            <div id="grid">
+
+            </div>
+        </div>
+    </div>
+
+
+    <script src="http://g.tbcdn.cn/fi/bui/jquery-1.8.1.min.js"></script>
+    <script src="http://g.alicdn.com/bui/seajs/2.3.0/sea.js"></script>
+    <script src="http://g.alicdn.com/bui/bui/1.1.21/config.js"></script>
+
+    <!-- script start -->
+    <script type="text/javascript">
+        BUI.use(['bui/grid','bui/data'],function(Grid,Data){
+            var Grid = Grid,
+                    Store = Data.Store,
+                    columns = [{title : '表头1',dataIndex :'a', width:100},
+                        {title : '表头2',dataIndex :'b', width:200},
+                        {title : '表头3',dataIndex : 'c', width:200}
+                    ],
+            //由于设置了数据跟状态的对应关系，此时状态会反映到Html上面
+            //disabled的字段无法被选中
+                    data = [{a:'123',selected : true},{a:'cdd',b:'edd',disabled:true},{a:'1333',c:'eee',d:2}];
+
+            var store = new Store({
+                        data : data,
+                        autoLoad:true
+                    }),
+                    grid = new Grid.Grid({
+                        render:'#grid',
+                        columns : columns,
+                        itemStatusFields : { //设置数据跟状态的对应关系
+                            selected : 'selected',
+                            disabled : 'disabled'
+                        },
+                        store : store,
+                        plugins : [Grid.Plugins.CheckSelection]	// 插件形式引入多选表格
+                        //multiSelect: true  // 控制表格是否可以多选，但是这种方式没有前面的复选框 默认为false
+                    });
+
+            grid.render();
+        });
+    </script>
+    <!-- script end -->
+</div>
+</body>
+</html>
